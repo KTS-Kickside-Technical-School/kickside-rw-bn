@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const uri =
+const uri = 
     process.env.NODE_ENV === 'production'
         ? process.env.MONGO_PROD_DB
         : process.env.NODE_ENV === 'test'

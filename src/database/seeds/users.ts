@@ -1,7 +1,7 @@
 import User from "../models/user";
 import { hashPassword } from "../../helpers/authHelpers";
 import mongoose from 'mongoose';
-import { userOneId, userTwoId } from "../../types/seedsIds";
+import { userOneId, userThreeId, userTwoId } from "../../types/seedsIds";
 
 const seedUsers = async () => {
     const users = [
@@ -20,6 +20,14 @@ const seedUsers = async () => {
             email: "journalist1@kickside.rw",
             password: await hashPassword("password123"),
             role: "journalist",
+        },
+        {
+            _id: new mongoose.Types.ObjectId(userThreeId),
+            firstName: "Niyonkuru",
+            lastName: "Jean",
+            email: "niyonkurua97@gmail.com",
+            password: await hashPassword("123"),
+            role: "Developer"
         }
     ];
 
