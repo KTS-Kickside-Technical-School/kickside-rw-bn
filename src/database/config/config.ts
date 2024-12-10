@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
-// Load environment variables from .env file
 dotenv.config();
 
 const uri =
@@ -10,6 +9,7 @@ const uri =
         : process.env.NODE_ENV === 'test'
             ? process.env.MONGO_TEST_DB
             : process.env.MONGO_DEV_DB;
+            
 
 export const connect = async (): Promise<void> => {
     try {
