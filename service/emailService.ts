@@ -12,6 +12,7 @@ const transporter = nodemailer.createTransport({
 });
 
 export const sendLoginNotification = async (email: string, device: string, location: string): Promise<void> => {
+    const currentYear = new Date().getFullYear();
     const emailTemplate = `
     <!DOCTYPE html>
     <html>
@@ -33,7 +34,7 @@ export const sendLoginNotification = async (email: string, device: string, locat
                 <p>If this wasn't you, please reset your password immediately by <a href="https://yourdomain.com/reset-password" style="color: #007BFF; text-decoration: none;">clicking here</a>.</p>
             </div>
             <div style="background: #f1f1f1; text-align: center; padding: 10px; font-size: 12px; color: #777;">
-                <p>&copy; 2023 Kickside Rwanda</p>
+                <p>&copy; ${currentYear} Kickside Rwanda</p>
                 <div>
                     <a href="https://facebook.com/kickside_rw" style="margin: 0 10px; text-decoration: none; color: #007BFF;">Facebook</a>
                     <a href="https://twitter.com/kickside_rw" style="margin: 0 10px; text-decoration: none; color: #007BFF;">Twitter</a>
