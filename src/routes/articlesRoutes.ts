@@ -13,4 +13,5 @@ articlesRoute.post("/", userAuthorization(["user"]), isArticleAlreadyExists, mul
 articlesRoute.get("/", articlesControllers.getAllArticles);
 articlesRoute.get("/:_id", isArticleExists, articlesControllers.getSingleArticle)
 
+
 export default articlesRoute;

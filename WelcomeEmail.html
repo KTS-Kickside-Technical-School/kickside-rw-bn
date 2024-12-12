@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<body>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+    .container {
+        width: 100%;
+        max-width: 600px;
+        margin: auto;
+        background: #ffffff;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    .header {
+        background: #abcff5;
+        color: #ffffff;
+        padding: 20px;
+        text-align: center;
+    }
+    .body {
+        padding: 20px;
+    }
+    .footer {
+        background: #f1f1f1;
+        text-align: center;
+        padding: 10px;
+        font-size: 12px;
+    }
+    .social-links a {
+        margin: 0 10px;
+        text-decoration: none;
+        color: #007BFF;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <img src="Logo Full design.png" alt="Company Logo" style="max-width: 50px; height: 50px;">
+        <h1>Kickside Rwanda</h1>
+    </div>
+    <div class="body">
+        <h2>New Login Detected!</h2>
+        <p>Dear ....,</p>
+         <p>We detected a login to your account from a new device or location:</p>
+    <ul>
+        <li><b>Device:</b> ${device}</li>
+        <li><b>Location:</b> ${location}</li>
+        <li><b>Time:</b> ${new Date().toLocaleString()}</li>
+    </ul>
+    <p>If this wasn't you, please reset your password immediately <a href="https://">Click Here to reset your password</a>.</p>
+        
+    </div>
+    <div class="footer">
+        <p>&copy; 2023 Kickside Rwanda</p>
+        <div class="social-links">
+            <a href="https://facebook.com/kickside_rw">Facebook</a>
+            <a href="https://twitter.com/kickside_rw">Twitter</a>
+            <a href="https://instagram.com/kickside_rw">Instagram</a>
+        </div>
+        <p>This is an automated message. Please do not reply.</p>
+    </div>
+</div>
+
+</body>
+</html>
