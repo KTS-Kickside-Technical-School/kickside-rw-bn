@@ -19,17 +19,21 @@ export const userAuthorization = function (roles: string[]) {
             );
             if (!session) {
                 return res
-                .status(401)
-                .json({ status: 401, message: "Not authorized" });
+                    .status(401)
+                    .json({ status: 401, message: "Not authorized" });
             }
-            
+
             const user = await authRepositories.findUserByAttribute("_id", decoded._id);
             if (!user) {
                 return res
-                .status(401)
-                .json({ status: 401, message: "Not authorized" });
+                    .status(401)
+                    .json({ status: 401, message: "Not authorized" });
             }
-            
+            if (!roles.includes(user.role)) {
+                return res.status(401).json({
+                    status: 401, message: "Not authorized"
+                })
+            }
             req.user = user;
             req.session = session;
             next();

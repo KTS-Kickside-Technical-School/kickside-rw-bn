@@ -1,0 +1,176 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Kickside Backend API",
+        "version": "1.0.0",
+        "description": "API documentation for the Kickside backend. This backend powers the functionalities of the Kickside platform."
+    },
+    "servers": [
+        {
+            "url": "http://localhost:7071/api"
+        }
+    ],
+    "paths": {
+        "/auth/login": {
+            "post": {
+                "summary": "Login a user",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserLogin"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User successfully logged in."
+                    },
+                    "400": {
+                        "description": "Invalid request body."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    }
+                }
+            }
+        },
+        "/articles": {
+            "post": {
+                "summary": "Create a new article",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/NewArticle"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Article created successfully."
+                    },
+                    "400": {
+                        "description": "Invalid request body."
+                    },
+                    "409": {
+                        "description": "Article already exists."
+                    }
+                }
+            },
+            "get": {
+                "summary": "Retrieve all articles",
+                "responses": {
+                    "200": {
+                        "description": "A list of articles.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Article"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/articles/{_id}": {
+            "get": {
+                "summary": "Retrieve a single article",
+                "parameters": [
+                    {
+                        "name": "_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "The ID of the article to retrieve."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Details of a single article.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Article"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Article not found."
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "UserLogin": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "description": "User email."
+                    },
+                    "password": {
+                        "type": "string",
+                        "format": "password",
+                        "description": "User password."
+                    }
+                },
+                "required": ["email", "password"]
+            },
+            "NewArticle": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "description": "Title of the article."
+                    },
+                    "content": {
+                        "type": "string",
+                        "description": "Content of the article."
+                    },
+                    "images": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "binary",
+                            "description": "Uploaded images."
+                        }
+                    }
+                },
+                "required": ["title", "content"]
+            },
+            "Article": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "description": "Title of the article."
+                    },
+                    "content": {
+                        "type": "string",
+                        "description": "Content of the article."
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Creation date of the article."
+                    }
+                }
+            }
+        }
+    }
+}
