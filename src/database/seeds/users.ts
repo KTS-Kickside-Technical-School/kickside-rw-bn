@@ -11,7 +11,7 @@ const seedUsers = async () => {
             lastName: "one",
             email: "editor@kickside.rw",
             password: await hashPassword("password123"),
-            role: "editor",
+            role: "Editor",
         },
         {
             _id: new mongoose.Types.ObjectId(userTwoId),
@@ -19,7 +19,7 @@ const seedUsers = async () => {
             lastName: "One",
             email: "journalist1@kickside.rw",
             password: await hashPassword("password123"),
-            role: "journalist",
+            role: "Journalist",
         },
         {
             _id: new mongoose.Types.ObjectId(userThreeId),
