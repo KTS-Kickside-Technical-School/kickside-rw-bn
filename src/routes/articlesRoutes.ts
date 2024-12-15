@@ -9,7 +9,7 @@ import { userAuthorization } from '../middlewares/authorization';
 
 const articlesRoute = express.Router();
 
-articlesRoute.post("/", userAuthorization(["user"]), isArticleAlreadyExists, multerConfig.array("images"), transformFilesToBody, bodyValidation(newArticleSchema), articlesControllers.createNewArticle);
+articlesRoute.post("/", userAuthorization(["user"]), bodyValidation(newArticleSchema), isArticleAlreadyExists, multerConfig.array("images"), transformFilesToBody, articlesControllers.createNewArticle);
 articlesRoute.get("/", articlesControllers.getAllArticles);
 articlesRoute.get("/:_id", isArticleExists, articlesControllers.getSingleArticle)
 

@@ -9,7 +9,7 @@ const articleSchema = new Schema({
         type: String,
         required: true
     },
-    image: {
+    coverImage: {
         type: String,
         required: true
     },
@@ -21,6 +21,11 @@ const articleSchema = new Schema({
     category: {
         type: String,
         required: true
+    },
+    isDeleted: {
+        type: Boolean,
+        required: true,
+        default: false
     },
     status: {
         type: String,

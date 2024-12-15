@@ -3,7 +3,7 @@ import articlesRepositories from "../repository/articlesRepositories"
 
 
 
-export const isArticleAlreadyExists = async (req, res: Response, next: NextFunction): Promise<any> => {
+export const isArticleAlreadyExists = async (req: any, res: Response, next: NextFunction): Promise<any> => {
     try {
         const article = await articlesRepositories.findArticleByAttribute("title", req.body.title);
         if (article) {
@@ -12,7 +12,6 @@ export const isArticleAlreadyExists = async (req, res: Response, next: NextFunct
                 message: "Article already exists"
             })
         }
-        console.log(article);
         return next();
     } catch (error) {
         res.status(500).json({
