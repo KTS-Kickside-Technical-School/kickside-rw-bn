@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-export const sendLoginNotification = async (email: string, device: string, location: string): Promise<void> => {
+export const sendEmail = async (email: string, device: string, location: string): Promise<void> => {
     const currentYear = new Date().getFullYear();
     const emailTemplate = `
     <!DOCTYPE html>
