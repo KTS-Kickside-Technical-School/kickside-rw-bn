@@ -3,7 +3,7 @@ import { comparePassword, generateToken } from "../helpers/authHelpers";
 import authRepositories from "../repository/authRepositories";
 import mongoose from "mongoose";
 import { lookupLocation } from "../utils/geoService";
-import { sendEmail } from "../../service/emailService";
+import { sendEmail } from "../service/emailService";
 
 const userLogin = async (req: any, res: Response): Promise<any> => {
 
@@ -31,8 +31,9 @@ const userLogin = async (req: any, res: Response): Promise<any> => {
         const userAgent = req.headers["user-agent"] || "Unknown Devices";
         const ip = req.ip || req.connection.remoteAddress;
         const location = lookupLocation(ip)
+        const isLogin= true
 
-        await sendEmail(req.user.email, userAgent, location);
+        await sendEmail(req.user.email, userAgent, location, isLogin);
 
 
         return res.status(200).json({
