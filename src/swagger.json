@@ -10,10 +10,18 @@
             "url": "http://localhost:7071/api"
         }
     ],
+    "security": [
+        {
+            "BearerAuth": []
+        }
+    ],
     "paths": {
         "/auth/login": {
             "post": {
                 "summary": "Login a user",
+                "tags": [
+                    "Authentication"
+                ],
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -37,13 +45,21 @@
                 }
             }
         },
-        "/articles": {
+        "/articles/create-article": {
             "post": {
                 "summary": "Create a new article",
+                "tags": [
+                    "Articles"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "multipart/form-data": {
+                        "application/json": {
                             "schema": {
                                 "$ref": "#/components/schemas/NewArticle"
                             }
@@ -61,12 +77,22 @@
                         "description": "Article already exists."
                     }
                 }
-            },
+            }
+        },
+        "/articles/get-own-articles": {
             "get": {
-                "summary": "Retrieve all articles",
+                "summary": "Retrieve articles owned by the user",
+                "tags": [
+                    "Articles"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "A list of articles.",
+                        "description": "A list of articles owned by the user.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -81,12 +107,20 @@
                 }
             }
         },
-        "/articles/{_id}": {
+        "/articles/get-own-single-article/{id}": {
             "get": {
-                "summary": "Retrieve a single article",
+                "summary": "Retrieve a single article owned by the user",
+                "tags": [
+                    "Articles"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "parameters": [
                     {
-                        "name": "_id",
+                        "name": "id",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -111,9 +145,99 @@
                     }
                 }
             }
+        },
+        "/articles/request-edit-access/{id}": {
+            "post": {
+                "summary": "Request edit access for an article",
+                "tags": [
+                    "Articles"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "The ID of the article for which edit access is requested."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Edit access requested successfully."
+                    },
+                    "404": {
+                        "description": "Article not found."
+                    },
+                    "409": {
+                        "description": "Edit access request already exists."
+                    }
+                }
+            }
+        },
+        "/articles/journalist-edit-article/{id}": {
+            "put": {
+                "summary": "Edit an article by a journalist",
+                "tags": [
+                    "Articles"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "The ID of the article to edit."
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EditArticle"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Article edited successfully."
+                    },
+                    "400": {
+                        "description": "Invalid request body."
+                    },
+                    "404": {
+                        "description": "Article not found."
+                    },
+                    "409": {
+                        "description": "Article cannot be edited."
+                    }
+                }
+            }
         }
     },
     "components": {
+        "securitySchemes": {
+            "BearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        },
         "schemas": {
             "UserLogin": {
                 "type": "object",
@@ -129,7 +253,10 @@
                         "description": "User password."
                     }
                 },
-                "required": ["email", "password"]
+                "required": [
+                    "email",
+                    "password"
+                ]
             },
             "NewArticle": {
                 "type": "object",
@@ -142,16 +269,36 @@
                         "type": "string",
                         "description": "Content of the article."
                     },
-                    "images": {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "format": "binary",
-                            "description": "Uploaded images."
-                        }
+                    "coverImage": {
+                        "type": "string"
+                    },
+                    "category": {
+                        "type": "string"
                     }
                 },
-                "required": ["title", "content"]
+                "required": [
+                    "title",
+                    "content",
+                    "coverImage",
+                    "category"
+                ]
+            },
+            "EditArticle": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "description": "Updated title of the article."
+                    },
+                    "content": {
+                        "type": "string",
+                        "description": "Updated content of the article."
+                    }
+                },
+                "required": [
+                    "title",
+                    "content"
+                ]
             },
             "Article": {
                 "type": "object",
