@@ -24,7 +24,11 @@ const articleSchema = new Schema({
     },
     isDeleted: {
         type: Boolean,
-        required: true,
+        default: false
+    },
+    isEditable: {
+        type: Boolean,
+        required: false,
         default: false
     },
     status: {
