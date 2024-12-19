@@ -38,7 +38,6 @@ const userLogin = async (req: any, res: Response): Promise<any> => {
         return res.status(200).json({
             status: 200,
             message: "Login successful",
-            token,
             user: req.user,
             session
         })
