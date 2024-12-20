@@ -2,12 +2,17 @@ import Article from "../database/models/article"
 import ArticleComment from "../database/models/articleComment";
 import ArticlesEditRequest from "../database/models/articlesEditRequest";
 
-const findAllArticles = async () => {
+const findPublishedArticles = async () => {
     return Article.find({ status: 'published' })
         .populate('author')
         .sort({ createdAt: -1 });
 }
 
+const findAllArticles = async () => {
+    return Article.find()
+        .populate('author')
+        .sort({ createdAt: -1 });
+}
 
 const findArticleByAttribute = async (key: any, value: String) => {
     return Article.findOne({ [key]: value }).populate('author')
@@ -37,13 +42,24 @@ const getArticleComments = async (article: any) => {
     return ArticleComment.find({ article }).sort({ createdAt: -1 })
 }
 
+const findArticlesEditRequests = async () => {
+    return ArticlesEditRequest.find()
+}
+
+const editArticleEditRequest = async (_id: any, data: any) => {
+    return await ArticlesEditRequest.findByIdAndUpdate({ _id }, data, { new: true })
+}
+
 export default {
     findAllArticles,
+    findPublishedArticles,
     findArticleByAttribute,
     findArticlesByAttribute,
     saveArticle,
     saveArticleEditRequest,
     findArticleEditRequestByAttribute,
     editArticle,
-    getArticleComments
+    getArticleComments,
+    findArticlesEditRequests,
+    editArticleEditRequest
 }
