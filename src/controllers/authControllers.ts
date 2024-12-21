@@ -4,6 +4,7 @@ import authRepositories from "../repository/authRepositories";
 import mongoose from "mongoose";
 import { lookupLocation } from "../utils/geoService";
 import { sendEmail } from "../service/emailService";
+import user from "../database/models/user";
 
 const userLogin = async (req: any, res: Response): Promise<any> => {
 
@@ -33,7 +34,7 @@ const userLogin = async (req: any, res: Response): Promise<any> => {
         const location = lookupLocation(ip)
         const isLogin= true
 
-        await sendEmail(req.user.email, userAgent, location, isLogin);
+        await sendEmail(req, req.user.email, 'login', {userAgent, location} );
 
 
         return res.status(200).json({
