@@ -1,49 +1,76 @@
-import jwt, {JwtPayload} from 'jsonwebtoken'
-import { Response, Request, NextFunction, RequestHandler } from 'express'
+import { number } from "joi";
+import workersRepositories from "../repository/workersRepositories";
+import { Response, request, NextFunction } from "express";
+import path from "path";
 
-export interface AuntheticateRequest extends Request {
-    user?: {
-            email: string;
-            role: string;
-            JwtPayload
-        };
-        };
 
-export const authenticate: RequestHandler = (req: Request, res: Response, next: NextFunction): void => {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) {
-        res.status(401).json({
-            status: 401,
-            message: "No token provided",
-        });
-        return;
-    }
+export const isWorkerExist = async(req: any, res: Response, next: NextFunction): Promise<any> =>{
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload;
-        (req as AuntheticateRequest).user = decoded;
-        next(); 
-    } catch (error) {
-        res.status(401).json({
-            status: 401,
-            message: "Invalid Token or Expired Token",
-        });
-        return; 
-    }
-};
+        const worker = await workersRepositories.findAllWorkers();
+        if(!worker.length){
+            return res.status(404).json({
+                status: 404,
+                message: "Worker Not Found"
+            })
 
-
-export const authorizeAdmin = (roles: string[]): RequestHandler => {
-    return (req, res, next): void => {
-        const user = (req as AuntheticateRequest).user;
-        if (!user || !roles.includes(user.role)) {
-            res.status(403).json({
-                status: 403,
-                message: "Access Denied",
-            });
-            return; 
         }
-        next(); 
-    };
+        req.worker=worker;
+        return next()
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            message: error.message
+        })
+        
+        
+    }
+}
+
+export const perseQueryParams = async(req: any, res: Response, next: NextFunction) =>{
+    try {
+
+        req.query.page = parseInt(req.query.page as string) || 1;
+        req.query.limit = parseInt(req.query.limit as string ) || 10;
+        req.query.skip = ((req.query.page as number) -1) * (req.query.limit as number)
+        req.query.sort = req.query.sort || 'createdAt'
+        req.query.filter = req.query.filter? JSON.parse(req.query.filter as string ): {}
+        next()
+        
+    } catch (error) {
+        res.status(400).json({
+            status: 400,
+            message: "Invalid Query Parameter"
+        })
+        
+    }
+
 };
 
+export const validateResetRequest = (req: any, res: Response, next: NextFunction): any => {
+    const { email, token, newPassword } = req.body;
 
+    if (req.path === "/request-reset") {
+        if (!email) {
+            return res.status(400).json({ 
+                status: 400, 
+                message: "Email is required" 
+            });
+        }
+    }
+
+    if (req.path === "/reset-password") {
+        if (!token || !newPassword) {
+            return res.status(400).json({ 
+                status: 400, 
+                message: "Token and new password are required" 
+            });
+        }
+    }
+
+    next(); 
+};
+
+export default{
+    isWorkerExist,
+    validateResetRequest
+}

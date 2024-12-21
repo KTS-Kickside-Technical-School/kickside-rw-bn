@@ -21,6 +21,24 @@ const userSchema = new Schema({
     role: {
         type: Object,
         required: true
+    },
+    isDisabled:{
+        type: Boolean,
+        default: false,
+        required: false
+    },
+    disableReason:{
+        type: String,
+        default: null,
+        required: false
+    },
+    resetPaaswordToken:{
+        type: String,
+        default: null
+    },
+    resetPasswordExpires:{
+        type: Date,
+        default: null
     }
 }, { timestamps: true })
 
