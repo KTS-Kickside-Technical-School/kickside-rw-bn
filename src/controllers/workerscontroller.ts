@@ -58,7 +58,7 @@ export const createUserController = async (req: any, res: Response, next: NextFu
         const isLogin = false;
         await user.save();
 
-        await sendEmail(req, user.email,'creation',{});
+        // await sendEmail(req, user.email,'creation',{});
         res.status(201).json({
             status: 201,
             message: 'User created successfully, email sent.',
@@ -138,7 +138,7 @@ export const disableUserController = async (req: any, res: Response, next: NextF
   
       await user.save(); 
   
-      await sendEmail(req, user.email,'disable', {reason});
+    //   await sendEmail(req, user.email,'disable', {reason});
   
       return res.status(200).json({
         status: 200,
@@ -184,7 +184,7 @@ export const enableUserController = async(req: any, res: Response, next:NextFunc
           user.disableReason = null;
           await user.save()
 
-          await sendEmail(req, user.email, 'enable',{});
+        //   await sendEmail(req, user.email, 'enable',{});
 
           return res.status(200).json({
             status: 200,
@@ -312,7 +312,7 @@ export const requestPasswordReset = async( req: Request, res: Response): Promise
         const token = generateResetToken();
         await saveResetPassword(email, token);
 
-        await sendEmail(req, user.email,'reset',{token})
+        // await sendEmail(req, user.email,'reset',{token})
         return res.status(200).json({
             status: 200,
             message: " Reset email sent "
@@ -383,11 +383,11 @@ export const updateUserRoleCotroller = async (req: Request, res: Response): Prom
         const newRole = role.toString();
 
 
-        await sendEmail(req, user.email, 'change', {
-            previousRole: previousRole,
-            newRole: newRole
+        // await sendEmail(req, user.email, 'change', {
+        //     previousRole: previousRole,
+        //     newRole: newRole
 
-        });
+        // });
         return res.status(200).json({
             status: 200,
             message: "User Role Changed Successfully",
