@@ -7,8 +7,8 @@ import { createUserSchema,
  } from '../validations/workersValidations'
 import bodyValidation from '../middlewares/bodyValidation'
 import { userAuthorization } from '../middlewares/authorization'
-import { isWorkerExist, perseQueryParams, validateResetRequest } from '../middlewares/workersMiddleware'
-import { validateToken } from '../repository/workersRepositories'
+import { isWorkersExist, parsePagination, validateResetRequest } from '../middlewares/workersMiddleware'
+
 
 
 const workersRoute = express.Router();
@@ -19,8 +19,9 @@ workersRoute.post("/create-user", userAuthorization(["admin"]),
  );
 
  workersRoute.get("/get-all-user", 
-    isWorkerExist,workerscontroller.getAllWorkers, perseQueryParams,
-    userAuthorization(["admin"])
+    userAuthorization(["admin"]),
+    isWorkersExist,
+    workerscontroller.getAllWorkers, parsePagination,
 );
 
 workersRoute.put("/disable-user/:userId", 

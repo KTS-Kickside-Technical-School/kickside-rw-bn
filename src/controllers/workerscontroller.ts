@@ -37,15 +37,6 @@ export const createUserController = async (req: any, res: Response, next: NextFu
         }
         const { firstName, lastName, email, role } = value;
 
-        const existingUser = await findUserByEmail(body.email);
-        if (existingUser) {
-            res.status(400).json({
-                status: 400,
-                message: "User with this email already exists",
-            });
-            return;
-        }
-
         const generatedPassword = crypto.randomBytes(4).toString('hex');
         const hashedPassword = await bcrypt.hash(generatedPassword, 10);
         const user = await createUser({ 

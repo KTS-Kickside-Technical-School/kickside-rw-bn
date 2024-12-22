@@ -4,7 +4,7 @@ import { Response, request, NextFunction } from "express";
 import path from "path";
 
 
-export const isWorkerExist = async(req: any, res: Response, next: NextFunction): Promise<any> =>{
+export const isWorkersExist = async(req: any, res: Response, next: NextFunction): Promise<any> =>{
     try {
         const worker = await workersRepositories.findAllWorkers();
         if(!worker.length){
@@ -26,7 +26,7 @@ export const isWorkerExist = async(req: any, res: Response, next: NextFunction):
     }
 }
 
-export const perseQueryParams = async(req: any, res: Response, next: NextFunction) =>{
+export const parsePagination = async(req: any, res: Response, next: NextFunction) =>{
     try {
 
         req.query.page = parseInt(req.query.page as string) || 1;
@@ -71,6 +71,6 @@ export const validateResetRequest = (req: any, res: Response, next: NextFunction
 };
 
 export default{
-    isWorkerExist,
+    isWorkersExist,
     validateResetRequest
 }

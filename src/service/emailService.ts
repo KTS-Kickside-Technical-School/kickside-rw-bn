@@ -269,8 +269,6 @@ export const sendEmail = async (
         default:
             break;
     }
-
-//     const loginEmailMessage = `
 //     <!DOCTYPE html>
 //     <html>
 //     <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
