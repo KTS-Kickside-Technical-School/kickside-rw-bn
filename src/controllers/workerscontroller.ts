@@ -1,94 +1,49 @@
 import bcrypt from 'bcrypt';
-import { findUserByEmail, 
-    createUser, 
-    countUser, 
-    findAllWorkers, 
-    disableUserById, 
-    deleteUserById,
-    updateUserDetails,
-    generateResetToken,
-    saveResetPassword,
-    validateToken,
-    updatePassword,
-    findUserById,
-    updateUserRole
-} from '../repository/workersRepositories';
-import { sendEmail } from '../service/emailService';
+import workersRepositories from '../repository/workersRepositories';
 import crypto from 'crypto';
 import { NextFunction, Request, Response } from 'express';
 import { createUserSchema } from '../validations/workersValidations';
 import mongoose from 'mongoose';
 import User from '../database/models/user';
+import { decodeToken, generateToken, hashPassword } from '../helpers/authHelpers';
 
-interface CreateUserRequest {
-    firstName: string;
-    lastName: string;
-    email: string;
-    role: string;
-}
 
 export const createUserController = async (req: any, res: Response, next: NextFunction): Promise<any> => {
     try {
-        const body: CreateUserRequest = req.body;
-        const { error, value } = createUserSchema.validate(body); // Assuming `createUserSchema` is a Joi schema
-        if (error) {
-            res.status(400).json({ message: error.details[0].message });
-            return;
-        }
-        const { firstName, lastName, email, role } = value;
-
-        const existingUser = await findUserByEmail(body.email);
-        if (existingUser) {
-            res.status(400).json({
-                status: 400,
-                message: "User with this email already exists",
-            });
-            return;
-        }
-
-        const generatedPassword = crypto.randomBytes(4).toString('hex');
-        const hashedPassword = await bcrypt.hash(generatedPassword, 10);
-        const user = await createUser({ 
-            firstName: body.firstName, 
-            lastName: body.lastName, 
-            email: body.email, 
-            role: role, 
-            password: hashedPassword });
-
-        const isLogin = false;
-        await user.save();
-
+        const generatedPassword = await hashPassword("1234");
+        req.body.password = generatedPassword
+        const user = await workersRepositories.createUser(req.body);
         // await sendEmail(req, user.email,'creation',{});
         res.status(201).json({
             status: 201,
-            message: 'User created successfully, email sent.',
+            message: 'Worker created successfully.',
             user,
         });
     } catch (error) {
         console.error(error);
-        next(error); 
+        next(error);
     }
 };
 
 
 
-export const getAllWorkers = async(req: any, res: Response, next: NextFunction): Promise<any>=>{
+export const getAllWorkers = async (req: any, res: Response, next: NextFunction): Promise<any> => {
     try {
-        const {filter, sort, skip, limit} = req.query as unknown as {
+        const { filter, sort, skip, limit } = req.query as unknown as {
             filter: object;
             sort: string;
             skip: number;
             limit: number
         }
-        const workers = await findAllWorkers(filter,sort, skip, limit);
-        const totalUser = await countUser(filter)
+        const workers = await workersRepositories.findAllWorkers(filter, sort, skip, limit);
+        const totalUser = await workersRepositories.countUser(filter)
         return res.status(201).json({
             status: 201,
             message: "User Retrieved Successfully",
-            data: {workers},
+            data: { workers },
             metaData: {
                 totalUser,
-                page: (req. query.page as number ) || 1,
+                page: (req.query.page as number) || 1,
                 limit,
                 totalPages: Math.ceil(totalUser / limit),
             },
@@ -100,96 +55,96 @@ export const getAllWorkers = async(req: any, res: Response, next: NextFunction):
             message: error.message
         })
         next(error);
-        
+
     }
 };
 
 export const disableUserController = async (req: any, res: Response, next: NextFunction): Promise<any> => {
     try {
-      const { userId } = req.params; 
-      const { reason } = req.body;
-  
+        const { userId } = req.params;
+        const { reason } = req.body;
 
-      if (!reason) {
-        return res.status(400).json({
-          status: 400,
-          message: "Disabling Reason Required",
-        });
-      }
 
-      if (!mongoose.Types.ObjectId.isValid(userId)) {
-        return res.status(400).json({
-          status: 400,
-          message: "Invalid User ID format",
-        });
-      }
-  
-      const user = await User.findById(userId); 
-  
-      if (!user) {
-        return res.status(404).json({
-          status: 404,
-          message: "User Not Found",
-        });
-      }
-  
-      user.isDisabled = true;
-      user.disableReason = reason;
-  
-      await user.save(); 
-  
-    //   await sendEmail(req, user.email,'disable', {reason});
-  
-      return res.status(200).json({
-        status: 200,
-        message: "User Account Disabled Successfully",
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({
-        status: 500,
-        message: "An unexpected error occurred.",
-        error: error.message,
-      });
-    }
-  };
-
-export const enableUserController = async(req: any, res: Response, next:NextFunction): Promise<any> =>{
-    try {
-        const {userId} = req.params
+        if (!reason) {
+            return res.status(400).json({
+                status: 400,
+                message: "Disabling Reason Required",
+            });
+        }
 
         if (!mongoose.Types.ObjectId.isValid(userId)) {
             return res.status(400).json({
-              status: 400,
-              message: "Invalid User ID format",
+                status: 400,
+                message: "Invalid User ID format",
             });
-          };
+        }
 
-          const user = await User.findById(userId)
-          if(!user){
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({
+                status: 404,
+                message: "User Not Found",
+            });
+        }
+
+        user.isDisabled = true;
+        user.disableReason = reason;
+
+        await user.save();
+
+        //   await sendEmail(req, user.email,'disable', {reason});
+
+        return res.status(200).json({
+            status: 200,
+            message: "User Account Disabled Successfully",
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            status: 500,
+            message: "An unexpected error occurred.",
+            error: error.message,
+        });
+    }
+};
+
+export const enableUserController = async (req: any, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const { userId } = req.params
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({
+                status: 400,
+                message: "Invalid User ID format",
+            });
+        };
+
+        const user = await User.findById(userId)
+        if (!user) {
             return res.status(404).json({
                 status: 404,
                 message: 'User Not Found'
             })
-          };
+        };
 
-          if(!user.isDisabled){
+        if (!user.isDisabled) {
             return res.status(400).json({
                 status: 400,
                 message: "User Is Already Active"
             })
-          };
+        };
 
-          user.isDisabled = false;
-          user.disableReason = null;
-          await user.save()
+        user.isDisabled = false;
+        user.disableReason = null;
+        await user.save()
 
         //   await sendEmail(req, user.email, 'enable',{});
 
-          return res.status(200).json({
+        return res.status(200).json({
             status: 200,
             message: "User Account Enabled Successfully"
-          });
+        });
 
 
 
@@ -199,22 +154,22 @@ export const enableUserController = async(req: any, res: Response, next:NextFunc
             status: 500,
             message: error.message
         })
-        
+
     }
 }
 
-export const deleteUserController = async(req: any, res: Response, next: NextFunction): Promise<any>=>{
+export const deleteUserController = async (req: any, res: Response, next: NextFunction): Promise<any> => {
     try {
-        const {userId} = req.params
-        if(!mongoose.Types.ObjectId.isValid(userId)){
+        const { userId } = req.params
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
             return res.status(400).json({
                 status: 400,
                 message: "Invalid User Id Format"
             })
         };
 
-        const deletedWorker = await deleteUserById(userId)
-        if (!deletedWorker){
+        const deletedWorker = await workersRepositories.deleteUserById(userId)
+        if (!deletedWorker) {
             return res.status(404).json({
                 status: 404,
                 message: "User not found"
@@ -224,7 +179,7 @@ export const deleteUserController = async(req: any, res: Response, next: NextFun
         return res.status(200).json({
             status: 200,
             message: "User Deleted Successfully",
-            data: {deletedWorker}
+            data: { deletedWorker }
         })
 
     } catch (error) {
@@ -233,26 +188,26 @@ export const deleteUserController = async(req: any, res: Response, next: NextFun
             status: 500,
             message: error.message
         })
-        
+
     }
 
 };
 
 
 
-export const updateUserController = async(req: any, res: Response, next: NextFunction): Promise<any> =>{
+export const updateUserController = async (req: any, res: Response, next: NextFunction): Promise<any> => {
     try {
-        const {userId} = req.params
-        const {firstName, lastName, email} = req.body
+        const { userId } = req.params
+        const { firstName, lastName, email } = req.body
 
-        if(!mongoose.Types.ObjectId.isValid(userId)){
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
             return res.status(400).json({
                 status: 400,
                 message: "Invalid UserId Format"
             })
         };
 
-        if(req.body.password || req.body.role){
+        if (req.body.password || req.body.role) {
             return res.status(400).json({
                 status: 400,
                 message: "Password and role can't be updated directly, on password please use password reset process"
@@ -260,8 +215,8 @@ export const updateUserController = async(req: any, res: Response, next: NextFun
             })
         };
 
-        const updatedUser = await updateUserDetails(userId, {firstName, lastName, email})
-        if(!updatedUser) {
+        const updatedUser = await workersRepositories.updateUserDetails(userId, { firstName, lastName, email })
+        if (!updatedUser) {
             return res.status(404).json({
                 status: 404,
                 message: "User Not Found"
@@ -269,7 +224,7 @@ export const updateUserController = async(req: any, res: Response, next: NextFun
         };
 
         return res.status(200).json({
-            status:200,
+            status: 200,
             mesage: "User Details Updated Successfully",
             data: updatedUser
         });
@@ -280,37 +235,37 @@ export const updateUserController = async(req: any, res: Response, next: NextFun
             status: 500,
             message: error.messsage
         })
-        
-        
+
+
     }
 };
 
 
 
-export const requestPasswordReset = async( req: Request, res: Response): Promise<any>=>{
+export const requestPasswordReset = async (req: Request, res: Response): Promise<any> => {
     try {
-        const {email} = req.body;
-        const {userId}=req.params
+        const { email } = req.body;
+        const { userId } = req.params
 
-        if(!mongoose.Types.ObjectId.isValid(userId)){
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
             return res.status(400).json({
                 status: 400,
                 message: "Invalid UserId Format"
             })
         };
 
-        const user = await findUserByEmail(email);
+        const user = await workersRepositories.findUserByEmail(email);
         console.log(`request email ${email}`);
-        
-        if(!user){
+
+        if (!user) {
             return res.status(404).json({
                 status: 404,
                 message: "User Not Found"
             });
         };
 
-        const token = generateResetToken();
-        await saveResetPassword(email, token);
+        const token = await generateToken(user._id);
+        await workersRepositories.saveResetPassword(email, token);
 
         // await sendEmail(req, user.email,'reset',{token})
         return res.status(200).json({
@@ -324,32 +279,32 @@ export const requestPasswordReset = async( req: Request, res: Response): Promise
             status: 500,
             message: error.mesage
         });
-        
+
     };
 };
 
 
 
-export const resetPassword = async(req: Request, res: Response): Promise<any>=>{
+export const resetPassword = async (req: Request, res: Response): Promise<any> => {
     try {
-        const {userId} = req.params
-        if(!mongoose.Types.ObjectId.isValid(userId)){
+        const { userId } = req.params
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
             return res.status(400).json({
                 status: 400,
                 message: "Invalid UserId Format"
             })
         };
 
-        const {token, newPassword} = req.body;
+        const { token, newPassword } = req.body;
 
-        const user = await validateToken(token);
-        if(!user){
+        const user = await decodeToken(token);
+        if (!user) {
             return res.status(400).json({
                 status: 400,
                 message: "Invalid or Expired token"
             });
         };
-        await updatePassword (user._id, newPassword);
+        await workersRepositories.updatePassword(user._id, newPassword);
         return res.status(200).json({
             status: 200,
             message: "Password Reset Successfully"
@@ -360,17 +315,17 @@ export const resetPassword = async(req: Request, res: Response): Promise<any>=>{
         res.status(500).json({
             status: 500,
             message: error.message
-        });  
+        });
     };
 };
 
 
 export const updateUserRoleCotroller = async (req: Request, res: Response): Promise<any> => {
     try {
-        const {userId} = req.params;
-        const {role} = req.body;
+        const { userId } = req.params;
+        const { role } = req.body;
 
-        const user = await findUserById(userId)
+        const user = await workersRepositories.findUserById(userId)
         if (!user) {
             return res.status(404).json({
                 status: 404,
@@ -379,7 +334,7 @@ export const updateUserRoleCotroller = async (req: Request, res: Response): Prom
         };
 
         const previousRole = user.role.toString();
-        const updatedRole = await updateUserRole(userId, role)
+        const updatedRole = await workersRepositories.updateUserRole(userId, role)
         const newRole = role.toString();
 
 
@@ -391,7 +346,7 @@ export const updateUserRoleCotroller = async (req: Request, res: Response): Prom
         return res.status(200).json({
             status: 200,
             message: "User Role Changed Successfully",
-            data: {updatedRole}
+            data: { updatedRole }
         });
 
     } catch (error) {

@@ -1,43 +1,46 @@
 import express from 'express'
-import workerscontroller, { requestPasswordReset, resetPassword } from '../controllers/workerscontroller'
-import { createUserSchema, 
+import workerscontroller from '../controllers/workerscontroller'
+import {
+    createUserSchema,
     disableUserSchema,
     updateRoleSchema,
     updateUserSchema
- } from '../validations/workersValidations'
+} from '../validations/workersValidations'
 import bodyValidation from '../middlewares/bodyValidation'
 import { userAuthorization } from '../middlewares/authorization'
-import { isWorkerExist, perseQueryParams, validateResetRequest } from '../middlewares/workersMiddleware'
-import { validateToken } from '../repository/workersRepositories'
-
+import {
+    isWorkerAlreadyExists,
+    isWorkersExists,
+    validateResetRequest
+} from '../middlewares/workersMiddleware'
 
 const workersRoute = express.Router();
 
-workersRoute.post("/create-user", userAuthorization(["admin"]),
-    bodyValidation(createUserSchema), 
+workersRoute.post("/create-user", userAuthorization(["Admin"]),
+    // bodyValidation(createUserSchema),
+    isWorkerAlreadyExists,
     workerscontroller.createUserController
- );
-
- workersRoute.get("/get-all-user", 
-    isWorkerExist,workerscontroller.getAllWorkers, perseQueryParams,
-    userAuthorization(["admin"])
 );
 
-workersRoute.put("/disable-user/:userId", 
-    userAuthorization(["admin"]),
+workersRoute.get("/get-all-users", userAuthorization(["Admin"]), isWorkersExists, workerscontroller.getAllWorkers,
+
+);
+
+workersRoute.put("/disable-user/:userId",
+    userAuthorization(["Admin"]),
     bodyValidation(disableUserSchema),
     workerscontroller.disableUserController
 );
 
 workersRoute.put("/enable-user/:userId/enable",
     workerscontroller.enableUserController,
-    userAuthorization(["admin"],
+    userAuthorization(["Admin"],
     )
 );
 
-workersRoute.delete("/delete-user/:userId", 
+workersRoute.delete("/delete-user/:userId",
     workerscontroller.deleteUserController,
-    userAuthorization(["admin"])
+    userAuthorization(["Admin"])
 );
 
 workersRoute.put("/update-user/:userId",
@@ -45,13 +48,13 @@ workersRoute.put("/update-user/:userId",
     workerscontroller.updateUserController
 );
 
-workersRoute.post("/request-reset/:userId", validateResetRequest,requestPasswordReset);
-workersRoute.post("/reset-password/:userId", validateResetRequest, resetPassword);
+workersRoute.post("/request-reset/:userId", validateResetRequest, workerscontroller.requestPasswordReset);
+workersRoute.post("/reset-password/:userId", validateResetRequest, workerscontroller.resetPassword);
 
 workersRoute.put("/changing-role/:userId",
     bodyValidation(updateRoleSchema),
     workerscontroller.updateUserRoleCotroller,
-    userAuthorization(["admin"]),
+    userAuthorization(["Admin"]),
 
-    )
+)
 export default workersRoute
