@@ -2,15 +2,15 @@ import Session from "../database/models/session"
 import User from "../database/models/user"
 
 const findUserByAttribute = async (key: any, value: String) => {
-    return User.findOne({ [key]: value }).select("+password")
+    return await User.findOne({ [key]: value }).select("+password")
 }
 
 const saveSession = async (data: any) => {
-    return Session.create(data);
+    return await Session.create(data);
 }
 
-const findSessionByUserIdAndToken = async (user, content) => {
-    return Session.findOne({ user, content })
+const findSessionByUserIdAndToken = async (user: any, content: any) => {
+    return await Session.findOne({ user, content })
 }
 
 export default {

@@ -1,7 +1,7 @@
 import User from "../models/user";
 import { hashPassword } from "../../helpers/authHelpers";
 import mongoose from 'mongoose';
-import { userOneId, userThreeId, userTwoId } from "../../types/seedsIds";
+import { userFourId, userOneId, userThreeId, userTwoId } from "../../types/seedsIds";
 
 const seedUsers = async () => {
     const users = [
@@ -27,8 +27,16 @@ const seedUsers = async () => {
             lastName: "Jean",
             email: "niyonkurua97@gmail.com",
             password: await hashPassword("123"),
-            role: "Developer"
-        }
+            role: "admin"
+        },
+        {
+            _id: new mongoose.Types.ObjectId(userFourId),
+            firstName: "Ndahimana",
+            lastName: "Bonheur",
+            email: "ndahimana154@gmail.com",
+            password: await hashPassword("password123"),
+            role: "Admin",
+        },
     ];
 
     await User.deleteMany({});
