@@ -50,6 +50,10 @@ const editArticleEditRequest = async (_id: any, data: any) => {
     return await ArticlesEditRequest.findByIdAndUpdate({ _id }, data, { new: true })
 }
 
+const saveArticleComment = async (data: any) => {
+    return await ArticleComment.create(data)
+}
+
 export default {
     findAllArticles,
     findPublishedArticles,
@@ -61,5 +65,6 @@ export default {
     editArticle,
     getArticleComments,
     findArticlesEditRequests,
-    editArticleEditRequest
+    editArticleEditRequest,
+    saveArticleComment
 }

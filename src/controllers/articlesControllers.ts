@@ -36,7 +36,11 @@ const getSingleArticle = async (req: any, res: Response): Promise<any> => {
         return res.status(200).json({
             status: 200,
             message: "Article retrieved successfully",
-            article: req.article
+            data:
+            {
+                article: req.article,
+                comments: req.comments
+            }
         })
     } catch (error) {
         res.status(500).json({
@@ -172,6 +176,22 @@ const approveArticlesEditRequests = async (req: any, res: Response): Promise<any
     }
 }
 
+const postArticleComment = async (req: any, res: Response): Promise<any> => {
+    try {
+        const comment = await articlesRepositories.saveArticleComment(req.body);
+        return res.status(201).json({
+            status: 201,
+            message: "Comment posted successfully",
+            comment
+        })
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            message: error.message
+        })
+    }
+}
+
 export default {
     getPublishedArticles,
     getAllArticles,
@@ -182,5 +202,6 @@ export default {
     editArticle,
     toggleArticlePublish,
     getAllArticlesEditRequests,
-    approveArticlesEditRequests
+    approveArticlesEditRequests,
+    postArticleComment
 }

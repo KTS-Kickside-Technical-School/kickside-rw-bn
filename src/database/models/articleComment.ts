@@ -9,7 +9,8 @@ const articleCommentSchema = new Schema({
     email: {
         type: String,
         required: false
-    }, names: {
+    },
+    names: {
         type: String,
         required: false
     },
@@ -19,6 +20,6 @@ const articleCommentSchema = new Schema({
     }
 }, { timestamps: true })
 
-const ArticleComment = mongoose.model("ArticleComment",articleCommentSchema);
+const ArticleComment = mongoose.model("ArticleComment", articleCommentSchema);
 
 export default ArticleComment

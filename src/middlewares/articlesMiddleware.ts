@@ -24,7 +24,7 @@ export const isArticleAlreadyExists = async (req: any, res: Response, next: Next
 
 export const isArticleExists = async (req: any, res: Response, next: NextFunction): Promise<any> => {
     try {
-        const { id } = req.params;
+        const id = req.params.id || req.body.article;
 
         if (!id || !mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({
@@ -44,7 +44,7 @@ export const isArticleExists = async (req: any, res: Response, next: NextFunctio
         req.article = article;
 
         const comments = await isArticleHaveComments(article._id);
-        req.article.comments = comments;
+        req.comments = comments;
 
         return next();
     } catch (error) {

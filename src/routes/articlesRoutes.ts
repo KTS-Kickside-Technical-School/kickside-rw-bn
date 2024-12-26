@@ -9,7 +9,7 @@ import {
     isArticleOwned
 } from '../middlewares/articlesMiddleware';
 import bodyValidation from '../middlewares/bodyValidation';
-import { editArticleSchema, newArticleSchema } from '../validations/articlesValidations';
+import { editArticleSchema, newArticleSchema, postArticleComment } from '../validations/articlesValidations';
 import { userAuthorization } from '../middlewares/authorization';
 
 const articlesRoute = express.Router();
@@ -26,6 +26,8 @@ articlesRoute.put("/editor-edit-article/:id", userAuthorization(["Editor", "Admi
 articlesRoute.get("/get-all-articles-edit-requests", userAuthorization(["Editor", "Admin"]), articlesControllers.getAllArticlesEditRequests);
 articlesRoute.put("/confirm-edit-request/:id", userAuthorization(["Editor", "Admin"]), isArticleEditRequestExistsAndPending, articlesControllers.approveArticlesEditRequests);
 
-articlesRoute.get("/:id", isArticleExists, articlesControllers.getSingleArticle)
+articlesRoute.get("/get-published-articles", articlesControllers.getPublishedArticles);
+articlesRoute.get("/get-single-article/:id", isArticleExists, articlesControllers.getSingleArticle);
+articlesRoute.post("/post-comments", bodyValidation(postArticleComment), isArticleExists, articlesControllers.postArticleComment);
 
 export default articlesRoute;
