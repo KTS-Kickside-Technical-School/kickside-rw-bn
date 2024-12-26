@@ -1,13 +1,9 @@
 import { Response } from "express";
 import { comparePassword, generateToken } from "../helpers/authHelpers";
 import authRepositories from "../repository/authRepositories";
-import mongoose from "mongoose";
-import { lookupLocation } from "../utils/geoService";
 import { sendEmail } from "../service/emailService";
-import user from "../database/models/user";
 
 const userLogin = async (req: any, res: Response): Promise<any> => {
-
     try {
         const isPasswordMatch = await comparePassword(req.body.password, req.user.password);
 
@@ -17,7 +13,14 @@ const userLogin = async (req: any, res: Response): Promise<any> => {
                 message: "Email or Password is not correct.",
             })
         }
-        const token = generateToken(req.user._id);
+        if (req.user.isDisabled === true) {
+            return res.status(401).json({
+                status: 401,
+                message: "Your account has been disabled. Please contact the administrator."
+            })
+        }
+        
+        const token = await generateToken(req.user._id);
         const session = await authRepositories.saveSession({
             user: req.user._id,
             content: token

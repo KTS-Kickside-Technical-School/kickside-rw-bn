@@ -115,6 +115,7 @@ export const sendEmail = async (email: string, subject: string, title: string, c
                     </a>
                 </p>
                 <p>This is an automated message. Please do not reply.</p>
+                <p>If you have any questions, please contact us at ${process.env.SUPPORT_EMAIL}</p>
             </div>
         </div>
     </body>
