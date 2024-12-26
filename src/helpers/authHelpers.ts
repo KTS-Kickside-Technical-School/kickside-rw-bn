@@ -5,8 +5,8 @@ export const hashPassword = async (password: string) => {
     return await bcrypt.hash(password, 10);
 }
 
-export const generateToken = (_id: string) => {
-    return jwt.sign({ _id }, process.env.JWT_SECRET);
+export const generateToken = async (_id: any) => {
+    return await jwt.sign({ _id }, process.env.JWT_SECRET);
 };
 
 export const decodeToken = (token: string) => {

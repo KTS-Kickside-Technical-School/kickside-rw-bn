@@ -1,38 +1,38 @@
 import { Response } from "express";
 import { comparePassword, generateToken } from "../helpers/authHelpers";
 import authRepositories from "../repository/authRepositories";
-import mongoose from "mongoose";
-import { lookupLocation } from "../utils/geoService";
-import { sendEmail } from "../../service/emailService";
+import { sendEmail } from "../service/emailService";
 
 const userLogin = async (req: any, res: Response): Promise<any> => {
-
     try {
         const isPasswordMatch = await comparePassword(req.body.password, req.user.password);
-        if (!req.body.password || !req.user.password) {
-            return res.status(400).json({
-                status: 400,
-                message: "Password is required"
-            })
-        };
 
         if (!isPasswordMatch) {
             return res.status(401).json({
                 status: 401,
-                message: "Incorrect password",
+                message: "Email or Password is not correct.",
             })
         }
-        const token = generateToken(req.user._id);
+        if (req.user.isDisabled === true) {
+            return res.status(401).json({
+                status: 401,
+                message: "Your account has been disabled. Please contact the administrator."
+            })
+        }
+        
+        const token = await generateToken(req.user._id);
         const session = await authRepositories.saveSession({
-            user: new mongoose.Types.ObjectId(req.user._id),
+            user: req.user._id,
             content: token
         });
 
-        const userAgent = req.headers["user-agent"] || "Unknown Devices";
+        const device = req.headers["user-agent"] || "Unknown Devices";
         const ip = req.ip || req.connection.remoteAddress;
-        const location = lookupLocation(ip)
 
-        await sendEmail(req.user.email, userAgent, location);
+        await sendEmail(req.user.email, 'New Login Detected - Kickside Rw',
+            'New Account Login',
+            `<p>New login was detected to you account on <b>${device}</b> with this IP address: <b>${ip}</b>, if this was not you try reseting password.</p>`
+        );
 
 
         return res.status(200).json({
