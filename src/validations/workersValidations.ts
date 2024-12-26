@@ -2,32 +2,25 @@ import Joi from "joi";
 
 export const createUserSchema = Joi.object({
     firstName: Joi.string().required(),
-    lastName: Joi.string().required(),
+    lastName: Joi.string(),
     email: Joi.string().required(),
-    role: Joi.object({
-        type: Joi.string().valid('journalist', 'cheif editor', 'admin').required(),
-    }).required(),
-    password: Joi.string().required(),
+    role: Joi.string().valid('Journalist', 'Editor', 'Admin'),
 })
+
 export const disableUserSchema = Joi.object({
-    email: Joi.string().required(),
-    disableStatus: Joi.boolean().required(),
-    reason: Joi.string().required()
+    _id: Joi.string().required(),
+    disableReason: Joi.string().required()
 });
 
 export const updateUserSchema = Joi.object({
-    firstName: Joi.string().required(),
-    lastName: Joi.string().required(),
-    email:Joi.string().required(),
-
+    _id: Joi.string().required(),
+    firstName: Joi.string(),
+    lastName: Joi.string(),
+    email: Joi.string(),
+    password: Joi.string(),
 })
 
 export const updateRoleSchema = Joi.object({
-    role: Joi.string().valid('journalist','admin','cheif editor').required()
+    _id: Joi.string().required(),
+    role: Joi.string().valid('Journalist', 'Editor', 'Admin').required()
 })
-export default {
-    createUserSchema,
-    disableUserSchema,
-    updateUserSchema,
-    updateRoleSchema
-}

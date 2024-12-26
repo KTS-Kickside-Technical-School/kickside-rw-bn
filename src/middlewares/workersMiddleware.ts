@@ -1,76 +1,22 @@
-import { number } from "joi";
+import authRepositories from "../repository/authRepositories";
 import workersRepositories from "../repository/workersRepositories";
-import { Response, request, NextFunction } from "express";
-import path from "path";
+import { Response, NextFunction } from "express";
 
-
-export const isWorkersExist = async(req: any, res: Response, next: NextFunction): Promise<any> =>{
+export const isWorkerAlreadyExists = async (req: any, res: Response, next: NextFunction): Promise<any> => {
     try {
-        const worker = await workersRepositories.findAllWorkers();
-        if(!worker.length){
-            return res.status(404).json({
-                status: 404,
-                message: "Worker Not Found"
-            })
+        const worker = await workersRepositories.findWorkerByAttribute("email", req.body.email);
 
+        if (worker) {
+            return res.status(400).json({
+                status: 400,
+                message: "Worker already exists"
+            })
         }
-        req.worker=worker;
         return next()
     } catch (error) {
         res.status(500).json({
             status: 500,
             message: error.message
         })
-        
-        
     }
-}
-
-export const parsePagination = async(req: any, res: Response, next: NextFunction) =>{
-    try {
-
-        req.query.page = parseInt(req.query.page as string) || 1;
-        req.query.limit = parseInt(req.query.limit as string ) || 10;
-        req.query.skip = ((req.query.page as number) -1) * (req.query.limit as number)
-        req.query.sort = req.query.sort || 'createdAt'
-        req.query.filter = req.query.filter? JSON.parse(req.query.filter as string ): {}
-        next()
-        
-    } catch (error) {
-        res.status(400).json({
-            status: 400,
-            message: "Invalid Query Parameter"
-        })
-        
-    }
-
-};
-
-export const validateResetRequest = (req: any, res: Response, next: NextFunction): any => {
-    const { email, token, newPassword } = req.body;
-
-    if (req.path === "/request-reset") {
-        if (!email) {
-            return res.status(400).json({ 
-                status: 400, 
-                message: "Email is required" 
-            });
-        }
-    }
-
-    if (req.path === "/reset-password") {
-        if (!token || !newPassword) {
-            return res.status(400).json({ 
-                status: 400, 
-                message: "Token and new password are required" 
-            });
-        }
-    }
-
-    next(); 
-};
-
-export default{
-    isWorkersExist,
-    validateResetRequest
 }

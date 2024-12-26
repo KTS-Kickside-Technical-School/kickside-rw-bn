@@ -1,11 +1,24 @@
-import { Request, Response } from "express"
+import { NextFunction, Request, Response } from "express"
 import articlesRepositories from "../repository/articlesRepositories"
-import uploadImage from "../helpers/uploadImages";
-import mongoose from "mongoose";
 
 const getAllArticles = async (req: Request, res: Response): Promise<any> => {
     try {
         const articles = await articlesRepositories.findAllArticles();
+        return res.status(200).json({
+            status: 200,
+            articles
+        })
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            message: error.message
+        })
+    }
+}
+
+const getOwnArticles = async (req: any, res: Response): Promise<any> => {
+    try {
+        const articles = await articlesRepositories.findArticlesByAttribute("author", req.user._id)
         return res.status(200).json({
             status: 200,
             articles
@@ -35,21 +48,50 @@ const getSingleArticle = async (req: any, res: Response): Promise<any> => {
 
 const createNewArticle = async (req: any, res: Response): Promise<any> => {
     try {
-        const uploadPromises = req.files.map((file) => uploadImage(file))
-        const images = await Promise.all(uploadPromises)
-        const articleData = {
-            ...req.body,
-            author: new mongoose.Types.ObjectId(req.user._id),
-            image: images[0].secure_url
-        }
-        const article = await articlesRepositories.saveArticle(articleData);
+        req.body.author = req.user._id
+        const article = await articlesRepositories.saveArticle(req.body);
         return res.status(201).json({
             status: 201,
             message: "Article created successfully",
             article
         })
     } catch (error: any) {
-        console.log(error.message);
+        res.status(500).json({
+            status: 500,
+            message: error.message
+        })
+    }
+}
+
+const requestArticleEditAccess = async (req: any, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const data = {
+            article: req.article._id,
+            journalist: req.user._id
+        }
+        const request = await articlesRepositories.saveArticleEditRequest(data)
+        return res.status(201).json({
+            status: 201,
+            message: "Edit request is sent successfully",
+            request
+        })
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            message: error.message
+        })
+    }
+}
+
+const editArticle = async (req: any, res: Response): Promise<any> => {
+    try {
+        const article = await articlesRepositories.editArticle(req.article._id, req.body);
+        return res.status(200).json({
+            status: 200,
+            message: "Article updated successfully",
+            article
+        })
+    } catch (error) {
         res.status(500).json({
             status: 500,
             message: error.message
@@ -59,6 +101,9 @@ const createNewArticle = async (req: any, res: Response): Promise<any> => {
 
 export default {
     getAllArticles,
+    getOwnArticles,
     getSingleArticle,
-    createNewArticle
+    createNewArticle,
+    requestArticleEditAccess,
+    editArticle
 }
