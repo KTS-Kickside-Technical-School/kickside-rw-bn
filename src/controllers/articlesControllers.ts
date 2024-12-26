@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express"
 import articlesRepositories from "../repository/articlesRepositories"
 
-const getAllArticles = async (req: Request, res: Response): Promise<any> => {
+const getPublishedArticles = async (req: Request, res: Response): Promise<any> => {
     try {
-        const articles = await articlesRepositories.findAllArticles();
+        const articles = await articlesRepositories.findPublishedArticles();
         return res.status(200).json({
             status: 200,
             articles
@@ -36,7 +36,11 @@ const getSingleArticle = async (req: any, res: Response): Promise<any> => {
         return res.status(200).json({
             status: 200,
             message: "Article retrieved successfully",
-            article: req.article
+            data:
+            {
+                article: req.article,
+                comments: req.comments
+            }
         })
     } catch (error) {
         res.status(500).json({
@@ -99,11 +103,105 @@ const editArticle = async (req: any, res: Response): Promise<any> => {
     }
 }
 
+const getAllArticles = async (req: any, res: Response): Promise<any> => {
+    try {
+        const articles = await articlesRepositories.findAllArticles();
+        return res.status(200).json({
+            status: 200,
+            message: "Articles retrieved successfully",
+            data: {
+                articles
+            }
+        })
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            message: error.message
+        })
+    }
+}
+
+const toggleArticlePublish = async (req: any, res: Response): Promise<any> => {
+    try {
+        const status = req.article.status === 'published' ? 'unpublished' : 'published';
+        const isEditable = false;
+
+        const article = await articlesRepositories.editArticle(req.article._id, { status, isEditable });
+        return res.status(200).json({
+            status: 200,
+            message: 'Article status is changed successfully',
+            data: { article }
+        })
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            mmessage: error.message
+        })
+    }
+}
+
+const getAllArticlesEditRequests = async (req: any, res: Response): Promise<any> => {
+    try {
+        const editRequests = await articlesRepositories.findArticlesEditRequests();
+        return res.status(200).json({
+            status: 200,
+            message: "Edit articles requests successfully retrieved.",
+            data: {
+                editRequests
+            }
+        })
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            message: error.message
+        })
+    }
+}
+
+const approveArticlesEditRequests = async (req: any, res: Response): Promise<any> => {
+    try {
+        const article = await articlesRepositories.editArticle(req.editRequest.article, { isEditable: true });
+        const editRequest = await articlesRepositories.editArticleEditRequest(req.editRequest._id, { isAccepted: true });
+
+        return res.status(200).json({
+            status: 200,
+            message: "Article requeest is approved successfully",
+            data: { article, editRequest }
+        })
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            message: error.message
+        })
+    }
+}
+
+const postArticleComment = async (req: any, res: Response): Promise<any> => {
+    try {
+        const comment = await articlesRepositories.saveArticleComment(req.body);
+        return res.status(201).json({
+            status: 201,
+            message: "Comment posted successfully",
+            comment
+        })
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            message: error.message
+        })
+    }
+}
+
 export default {
+    getPublishedArticles,
     getAllArticles,
     getOwnArticles,
     getSingleArticle,
     createNewArticle,
     requestArticleEditAccess,
-    editArticle
+    editArticle,
+    toggleArticlePublish,
+    getAllArticlesEditRequests,
+    approveArticlesEditRequests,
+    postArticleComment
 }
