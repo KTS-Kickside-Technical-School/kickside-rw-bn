@@ -141,43 +141,6 @@ export const enableUser = async (req: any, res: Response, next: NextFunction): P
     }
 }
 
-export const deleteUserController = async (req: any, res: Response, next: NextFunction): Promise<any> => {
-    try {
-        const { userId } = req.params
-        if (!mongoose.Types.ObjectId.isValid(userId)) {
-            return res.status(400).json({
-                status: 400,
-                message: "Invalid User Id Format"
-            })
-        };
-
-        const deletedWorker = await workersRepositories.deleteUserById(userId)
-        if (!deletedWorker) {
-            return res.status(404).json({
-                status: 404,
-                message: "User not found"
-            })
-        };
-
-        return res.status(200).json({
-            status: 200,
-            message: "User Deleted Successfully",
-            data: { deletedWorker }
-        })
-
-    } catch (error) {
-        console.error(error)
-        res.status(500).json({
-            status: 500,
-            message: error.message
-        })
-
-    }
-
-};
-
-
-
 export const updateUser = async (req: any, res: Response, next: NextFunction): Promise<any> => {
     try {
         const updatedUser = await workersRepositories.updateUser(req.user._id, req.body);
@@ -234,6 +197,5 @@ export default {
     disableUser,
     enableUser,
     updateUser,
-    deleteUserController,
     updateUserRole
 }
