@@ -24,38 +24,30 @@ export const isArticleAlreadyExists = async (req: any, res: Response, next: Next
 
 export const isArticleExists = async (req: any, res: Response, next: NextFunction): Promise<any> => {
     try {
-        const id = req.params.id || req.body.article;
-
-        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({
-                status: 400,
-                message: "Invalid parameters"
-            });
-        }
-
+        const { id } = req.params
         const article = await articlesRepositories.findArticleByAttribute("_id", id);
         if (!article) {
             return res.status(404).json({
                 status: 404,
                 message: "Article not found"
-            });
+            })
         }
 
         req.article = article;
 
         const comments = await isArticleHaveComments(article._id);
-        req.comments = comments;
+        req.article.comments = comments
 
         return next();
+        
     } catch (error) {
-        console.error("Error in isArticleExists middleware:", error);
-        return res.status(500).json({
+        console.error(error);
+        res.status(500).json({
             status: 500,
-            message: "Internal server error",
-            error: error.message
-        });
+            message: error.message
+        })
     }
-};
+}
 
 export const isArticleOwned = async (req: any, res: any, next: NextFunction): Promise<any> => {
     try {
@@ -114,34 +106,6 @@ export const isArticleEditable = async (req: any, res: Response, next: NextFunct
     }
 }
 
-export const isArticleEditRequestExistsAndPending = async (req: any, res: Response, next: NextFunction): Promise<any> => {
-    try {
-        const { id } = req.params;
-
-        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({
-                status: 400,
-                message: "Invalid parameters"
-            });
-        }
-
-        const editRequest = await articlesRepositories.findArticleEditRequestByAttribute("_id", id);
-        if (!editRequest) {
-            return res.status(404).json({
-                status: 404,
-                message: "Article edit request not found"
-            })
-        }
-        req.editRequest = editRequest
-        return next();
-
-    } catch (error) {
-        res.status(500).json({
-            status: 500,
-            message: error.message
-        })
-    }
-}
 export const isArticleHaveComments = async (article: any) => {
     const comments = await articlesRepositories.getArticleComments(article);
     return comments

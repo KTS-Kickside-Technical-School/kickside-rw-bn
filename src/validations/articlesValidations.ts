@@ -15,10 +15,3 @@ export const editArticleSchema = Joi.object({
     category: Joi.string(),
     status: Joi.string()
 })
-
-export const postArticleComment = Joi.object({
-    article: Joi.string().required(),
-    email: Joi.string(),
-    names: Joi.string(),
-    comment: Joi.string().required()
-})

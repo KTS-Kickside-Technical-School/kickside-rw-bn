@@ -34,7 +34,7 @@ const articleSchema = new Schema({
     status: {
         type: String,
         required: true,
-        default: 'unpublished'
+        default: 'published'
     }
 }, { timestamps: true })
 
