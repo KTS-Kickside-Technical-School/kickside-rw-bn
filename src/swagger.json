@@ -228,6 +228,193 @@
                     }
                 }
             }
+        }, 
+        "/workers/create-user": {
+            "post": {
+                "summary": "Create a new user",
+                "tags": [
+                    "User Management"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateUser"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User created successfully."
+                    },
+                    "400": {
+                        "description": "Invalid request body."
+                    },
+                    "409": {
+                        "description": "User already exists."
+                    }
+                }
+            }
+        },
+        "/workers/get-all-users": {
+            "get": {
+                "summary": "Retrieve all users",
+                "tags": [
+                    "User Management"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                        }
+                    ],
+                "responses": {
+                    "200": {
+                        "description": "List of all users.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/User"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/workers/disable-user": {
+            "put": {
+                "summary": "Admin Disable a user",
+                "tags": [
+                    "User Management"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                        }
+                    ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DisableUser"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User disabled successfully."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    }
+                }
+            }
+        },
+        "/workers/enable-user/{id}": {
+            "put": {
+                "summary": "Admin Enable a user",
+                "tags": [
+                    "User Management"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                        }
+                    ],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "ID of the user to enable."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User enabled successfully."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    }
+                }
+            }
+        },
+        "/workers/update-user": {
+            "put": {
+                "summary": "Admin Update user details",
+                "tags": [
+                    "User Management"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                        }
+                    ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateUser"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User updated successfully."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    }
+                }
+            }
+        },
+        "/workers/update-user-role": {
+            "put": {
+                "summary": "Admin Update user role",
+                "tags": [
+                    "User Management"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                        }
+                    ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateRole"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User role updated successfully."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -315,6 +502,107 @@
                         "type": "string",
                         "format": "date-time",
                         "description": "Creation date of the article."
+                    }
+                }
+            },
+            "CreateUser": {
+                "type": "object",
+                "properties": {
+                    "firstName": {
+                        "type": "string",
+                        "description": "First Name of the user."
+                    },
+                    "lastName": {
+                        "type": "string",
+                        "description": "Last Name of the user."
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "description": "Email of the user."
+                    },
+                    "password": {
+                        "type": "string",
+                        "format": "password",
+                        "description": "Password for the user."
+                    },
+                    "role": {
+                        "type": "string",
+                        "description": "Role of the user."
+                    }
+                },
+                "required": ["name", "email", "password", "role"]
+            },
+            "DisableUser": {
+                "type": "object",
+                "properties": {
+                    "userId": {
+                        "type": "string",
+                        "description": "ID of the user to disable."
+                    }
+                },
+                "required": ["userId"]
+            },
+            "UpdateUser": {
+                "type": "object",
+                "properties": {
+                    "userId": {
+                        "type": "string",
+                        "description": "ID of the user to update."
+                    },
+                    "firstName": {
+                        "type": "string",
+                        "description": "First Name of the user."
+                    },
+                    "lastName": {
+                        "type": "string",
+                        "description": "Last Name of the user."
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "description": "Updated email of the user."
+                    }
+                },
+                "required": ["userId"]
+            },
+            "UpdateRole": {
+                "type": "object",
+                "properties": {
+                    "userId": {
+                        "type": "string",
+                        "description": "ID of the user to update role."
+                    },
+                    "role": {
+                        "type": "string",
+                        "description": "Updated role of the user."
+                    }
+                },
+                "required": ["userId", "role"]
+            },
+            "User": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "ID of the user."
+                    },
+                    "firstName": {
+                        "type": "string",
+                        "description": "First Name of the user."
+                    },
+                    "lastName": {
+                        "type": "string",
+                        "description": "Last Name of the user."
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "description": "Email of the user."
+                    },
+                    "role": {
+                        "type": "string",
+                        "description": "Role of the user."
                     }
                 }
             }
