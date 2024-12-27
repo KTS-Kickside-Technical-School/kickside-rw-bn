@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "http://localhost:7071/api"
+            "url": "http://localhost:5000/api"
         }
     ],
     "security": [
@@ -515,7 +515,7 @@
             }
         },
 
-        "/api/workers/create-user": {
+        "/workers/create-user": {
             "post": {
                 "summary": "Admin create new user",
                 "tags": [
@@ -549,7 +549,7 @@
                 }
             }
         },
-        "/api/workers/get-all-users": {
+        "/workers/get-all-users": {
             "get": {
                 "summary": "Retrieve all users",
                 "tags": [
@@ -583,7 +583,7 @@
                 }
             }
         },
-        "/api/workers/disable-user": {
+        "/workers/disable-user": {
             "put": {
                 "summary": "Disable a user",
                 "tags": [
@@ -614,7 +614,7 @@
                 }
             }
         },
-        "/api/workers/enable-user/{id}": {
+        "/workers/enable-user/{id}": {
             "put": {
                 "summary": "Enable a user",
                 "tags": [
@@ -627,7 +627,7 @@
                     ],
                 "parameters": [
                     {
-                        "name": "userId",
+                        "name": "_id",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -646,7 +646,7 @@
                 }
             }
         },
-        "/api/workers/update-user": {
+        "/workers/update-user": {
             "put": {
                 "summary": "Update user details",
                 "tags": ["User Management"],
@@ -675,7 +675,7 @@
                 }
             }
         },
-        "/api/workers/update-user-role": {
+        "/workers/update-user-role": {
             "put": {
                 "summary": "Update user role",
                 "tags": [
@@ -864,11 +864,6 @@
                         "format": "email",
                         "description": "Email of the user."
                     },
-                    "password": {
-                        "type": "string",
-                        "format": "password",
-                        "description": "Password for the user."
-                    },
                     "role": {
                         "type": "string",
                         "description": "Role of the user."
@@ -878,7 +873,6 @@
                     "firstName", 
                     "lastName" ,
                     "email", 
-                    "password", 
                     "role"
                 ]
             }, 
@@ -911,17 +905,21 @@
             "DisableUser": {
                 "type": "object",
                 "properties": {
-                    "userId": {
+                    "_id": {
                         "type": "string",
                         "description": "ID of the user to disable."
+                    },
+                    "disableReason":{
+                        "type": "string",
+                        "description": "Reason of disabling user"
                     }
                 },
-                "required": ["userId"]
+                "required": ["_id","disableReason"]
             },
             "UpdateUser": {
                 "type": "object",
                 "properties": {
-                    "userId": {
+                    "_id": {
                         "type": "string",
                         "description": "ID of the user to update."
                     },
@@ -939,12 +937,12 @@
                         "description": "Updated email of the user."
                     }
                 },
-                "required": ["userId"]
+                "required": ["_id"]
             },
             "UpdateRole": {
                 "type": "object",
                 "properties": {
-                    "userId": {
+                    "_id": {
                         "type": "string",
                         "description": "ID of the user to update role."
                     },
@@ -953,7 +951,7 @@
                         "description": "Updated role of the user."
                     }
                 },
-                "required": ["userId", "role"]
+                "required": ["_id", "role"]
             }
             
         }
