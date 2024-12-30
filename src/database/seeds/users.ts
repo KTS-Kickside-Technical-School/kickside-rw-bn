@@ -27,7 +27,7 @@ const seedUsers = async () => {
             lastName: "Jean",
             email: "niyonkurua97@gmail.com",
             password: await hashPassword("123"),
-            role: "admin"
+            role: "Admin"
         },
         {
             _id: new mongoose.Types.ObjectId(userFourId),

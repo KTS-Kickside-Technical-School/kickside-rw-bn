@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "http://localhost:7071/api"
+            "url": "http://localhost:5000/api"
         }
     ],
     "security": [
@@ -513,6 +513,198 @@
                     }
                 }
             }
+        },
+
+        "/workers/create-user": {
+            "post": {
+                "summary": "Admin create new user",
+                "tags": [
+                    "User Management"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/NewUser"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User created successfully."
+                    },
+                    "400": {
+                        "description": "Invalid request body."
+                    },
+                    "409": {
+                        "description": "User already exists."
+                    }
+                }
+            }
+        },
+        "/workers/get-all-users": {
+            "get": {
+                "summary": "Retrieve all users",
+                "tags": [
+                    "User Management"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A list of all users.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/User"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access."
+                    },
+                    "403": {
+                        "description": "Forbidden. User lacks required roles."
+                    }
+                }
+            }
+        },
+        "/workers/disable-user": {
+            "put": {
+                "summary": "Disable a user",
+                "tags": [
+                    "User Management"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                        }
+                    ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DisableUser"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User disabled successfully."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    }
+                }
+            }
+        },
+        "/workers/enable-user/{id}": {
+            "put": {
+                "summary": "Enable a user",
+                "tags": [
+                    "User Management"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                        }
+                    ],
+                "parameters": [
+                    {
+                        "name": "_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "ID of the user to enable."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User enabled successfully."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    }
+                }
+            }
+        },
+        "/workers/update-user": {
+            "put": {
+                "summary": "Update user details",
+                "tags": ["User Management"],
+                "security": [
+                    {
+                        "BearerAuth": []
+                        }
+                    ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateUser"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User updated successfully."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    }
+                }
+            }
+        },
+        "/workers/update-user-role": {
+            "put": {
+                "summary": "Update user role",
+                "tags": [
+                    "User Management"
+                ],
+                "security": [
+                    {
+                        "BearerAuth": []
+                        }
+                    ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateRole"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User role updated successfully."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -655,6 +847,111 @@
                         "format": "date-time"
                     }
                 }
+            },
+            "NewUser": {
+                "type": "object",
+                "properties": {
+                    "firstName": {
+                        "type": "string",
+                        "description": "First Name of User."
+                    },
+                    "lastName": {
+                        "type": "string",
+                        "description": "Last Name of User."
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "description": "Email of the user."
+                    },
+                    "role": {
+                        "type": "string",
+                        "description": "Role of the user."
+                    }
+                },
+                "required": [
+                    "firstName", 
+                    "lastName" ,
+                    "email", 
+                    "role"
+                ]
+            }, 
+            "User": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "ID of the user."
+                    },
+                    "firstName": {
+                        "type": "string",
+                        "description": " First Name of the user."
+                    },
+                    "lastName": {
+                        "type": "string",
+                        "description": " Last Name of the user."
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "description": "Email of the user."
+                    },
+                    "role": {
+                        "type": "string",
+                        "description": "Role of the user."
+                    }
+                }
+            },
+            "DisableUser": {
+                "type": "object",
+                "properties": {
+                    "_id": {
+                        "type": "string",
+                        "description": "ID of the user to disable."
+                    },
+                    "disableReason":{
+                        "type": "string",
+                        "description": "Reason of disabling user"
+                    }
+                },
+                "required": ["_id","disableReason"]
+            },
+            "UpdateUser": {
+                "type": "object",
+                "properties": {
+                    "_id": {
+                        "type": "string",
+                        "description": "ID of the user to update."
+                    },
+                    "firstName": {
+                        "type": "string",
+                        "description": " First Name of the user."
+                    },
+                    "lastName": {
+                        "type": "string",
+                        "description": " Last Name of the user."
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "description": "Updated email of the user."
+                    }
+                },
+                "required": ["_id"]
+            },
+            "UpdateRole": {
+                "type": "object",
+                "properties": {
+                    "_id": {
+                        "type": "string",
+                        "description": "ID of the user to update role."
+                    },
+                    "role": {
+                        "type": "string",
+                        "description": "Updated role of the user."
+                    }
+                },
+                "required": ["_id", "role"]
             }
             
         }
