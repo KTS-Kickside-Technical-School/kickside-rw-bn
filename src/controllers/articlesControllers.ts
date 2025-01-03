@@ -206,7 +206,32 @@ const postArticleComment = async (req: any, res: Response): Promise<any> => {
             message: error.message
         })
     }
+};
+
+const deleteArticle = async(req: any, res: Response , next:NextFunction): Promise<any> =>{
+    try {
+        const deletedArticle = await articlesRepositories.deleteArticle(req.article._id)
+        if(!deletedArticle){
+            res.status(404).json({
+                status: 404,
+                message: "Article not found"
+            })
+        };
+        return res.status(200).json({
+            status: 200,
+            message: "Article deleted successfully",
+            deletedData: {deletedArticle}
+        })
+        
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            message: error.message
+        })
+        
+    }
 }
+
 
 export default {
     getPublishedArticles,
@@ -219,5 +244,6 @@ export default {
     toggleArticlePublish,
     getAllArticlesEditRequests,
     approveArticlesEditRequests,
-    postArticleComment
+    postArticleComment,
+    deleteArticle
 }
