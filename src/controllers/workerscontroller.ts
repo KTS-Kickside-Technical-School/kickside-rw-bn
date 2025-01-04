@@ -191,41 +191,6 @@ export const updateUserRole = async (req: any, res: Response): Promise<any> => {
     };
 };
 
-export const forgotPassword = async(req: any, res: Response): Promise<any> =>{
-    try {
-        const {email}= req.body
-
-        const user = await workersRepositories.findWorkerByAttribute("email", email)
-        if(!user){
-            res.status(404).json({
-                status: 404,
-                message: "User not found"
-            })
-        };
-
-        const resetToken = jwt.sign({userId: user._id}, process.env.JWT_SECRET, {expiresIn: "1h"})
-        const reseLink = `/reset-password?token=${resetToken}`
-        await sendEmail(user.email, "Password reset request", 'Welcome to Kickside Rwanda',
-            `<p>Click <a href="${reseLink}">here</a> to reset your password. This link expires in 1 hour.</p>
-            If you have any questions or require assistance, feel free to reach out.
-            <br/>
-            Best regards,
-            <br/>
-            Kickside Rwanda Team
-            </p>`
-        )
-        return res.status(200).json({
-            status: 200,
-            message: "Password reset email sent successfully"
-        })
-    } catch (error) {
-        return res.status(500).json({
-            status: 500,
-            message: error.messsage
-        })
-        
-    }
-};
 
 export const resetPassword = async(req: any, res: Response):Promise<any> => {
     try {
@@ -236,7 +201,7 @@ export const resetPassword = async(req: any, res: Response):Promise<any> => {
         if (!user){
             return res.status(404).json({
                 status: 404,
-                message: "Invalid token  || user not found"
+                message: "Invalid token  or user not found"
             })
         };
 
@@ -264,7 +229,6 @@ export default {
     enableUser,
     updateUser,
     updateUserRole,
-    forgotPassword,
     resetPassword
 }
 
