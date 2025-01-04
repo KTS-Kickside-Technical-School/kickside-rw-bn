@@ -211,12 +211,6 @@ const postArticleComment = async (req: any, res: Response): Promise<any> => {
 const deleteArticle = async(req: any, res: Response , next:NextFunction): Promise<any> =>{
     try {
         const deletedArticle = await articlesRepositories.deleteArticle(req.article._id)
-        if(!deletedArticle){
-            res.status(404).json({
-                status: 404,
-                message: "Article not found"
-            })
-        };
         return res.status(200).json({
             status: 200,
             message: "Article deleted successfully",

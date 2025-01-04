@@ -19,7 +19,7 @@ articlesRoute.post("/create-article", userAuthorization(["Editor", "Journalist",
 articlesRoute.get("/get-own-articles", userAuthorization(["Editor", "Journalist","Admin"]), articlesControllers.getOwnArticles);
 articlesRoute.get("/get-own-single-article/:id", userAuthorization(["Editor", "Journalist","Admin"]), isArticleExists, isArticleOwned, articlesControllers.getSingleArticle);
 articlesRoute.post("/request-edit-access/:id", userAuthorization(["Journalist"]), isArticleExists, isArticleOwned, isArticleEditRequestAlreadyExists, articlesControllers.requestArticleEditAccess);
-articlesRoute.put("/journalist-edit-article/:id", userAuthorization(["Journalist"]), bodyValidation(editArticleSchema), isArticleExists, isArticleOwned, isArticleEditable, articlesControllers.editArticle);
+articlesRoute.put("/journalist-edit-article/:id", userAuthorization(["Journalist", "Admin"]), bodyValidation(editArticleSchema), isArticleExists, isArticleOwned, isArticleEditable, articlesControllers.editArticle);
 
 articlesRoute.get("/get-all-articles", userAuthorization(["Editor", "Admin"]), articlesControllers.getAllArticles);
 articlesRoute.put("/toggle-article-publish/:id", userAuthorization(["Editor", "Admin"]), isArticleExists, articlesControllers.toggleArticlePublish);
@@ -31,6 +31,6 @@ articlesRoute.get("/get-published-articles", articlesControllers.getPublishedArt
 articlesRoute.get("/get-single-article/:slug", isArticleExistsBySlug, articlesControllers.getSingleArticle);
 articlesRoute.post("/post-comments", bodyValidation(postArticleComment), isArticleExists, articlesControllers.postArticleComment);
 
-articlesRoute.delete("/delete-article/:id", isArticleExists, userAuthorization(["Admin"]), articlesControllers.deleteArticle);
+articlesRoute.delete("/delete-article/:id",  userAuthorization(["Admin"]),isArticleExists, articlesControllers.deleteArticle);
 
 export default articlesRoute;
