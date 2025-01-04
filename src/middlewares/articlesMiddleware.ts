@@ -57,6 +57,34 @@ export const isArticleExists = async (req: any, res: Response, next: NextFunctio
     }
 };
 
+export const isArticleExistsBySlug = async (req: any, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const slug = req.params.slug
+
+        const article = await articlesRepositories.findArticleByAttribute("slug", slug);
+        if (!article) {
+            return res.status(404).json({
+                status: 404,
+                message: "Article not found"
+            });
+        }
+
+        req.article = article;
+
+        const comments = await isArticleHaveComments(article._id);
+        req.comments = comments;
+
+        return next();
+    } catch (error) {
+        console.error("Error in isArticleExists middleware:", error);
+        return res.status(500).json({
+            status: 500,
+            message: "Internal server error",
+            error: error.message
+        });
+    }
+};
+
 export const isArticleOwned = async (req: any, res: any, next: NextFunction): Promise<any> => {
     try {
         const isArticleOwned = req.article.author._id.equals(req.user._id);

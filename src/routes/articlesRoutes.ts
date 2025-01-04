@@ -6,6 +6,7 @@ import {
     isArticleEditRequestAlreadyExists,
     isArticleEditRequestExistsAndPending,
     isArticleExists,
+    isArticleExistsBySlug,
     isArticleOwned
 } from '../middlewares/articlesMiddleware';
 import bodyValidation from '../middlewares/bodyValidation';
@@ -27,7 +28,7 @@ articlesRoute.get("/get-all-articles-edit-requests", userAuthorization(["Editor"
 articlesRoute.put("/confirm-edit-request/:id", userAuthorization(["Editor", "Admin"]), isArticleEditRequestExistsAndPending, articlesControllers.approveArticlesEditRequests);
 
 articlesRoute.get("/get-published-articles", articlesControllers.getPublishedArticles);
-articlesRoute.get("/get-single-article/:id", isArticleExists, articlesControllers.getSingleArticle);
+articlesRoute.get("/get-single-article/:slug", isArticleExistsBySlug, articlesControllers.getSingleArticle);
 articlesRoute.post("/post-comments", bodyValidation(postArticleComment), isArticleExists, articlesControllers.postArticleComment);
 
 export default articlesRoute;
