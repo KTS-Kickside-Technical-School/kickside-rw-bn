@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express"
+import slugify from 'slugify';
 import articlesRepositories from "../repository/articlesRepositories"
 
 const getPublishedArticles = async (req: Request, res: Response): Promise<any> => {
@@ -52,6 +53,7 @@ const getSingleArticle = async (req: any, res: Response): Promise<any> => {
 
 const createNewArticle = async (req: any, res: Response): Promise<any> => {
     try {
+        req.body.slug = generateSlug(req.body.title)
         req.body.author = req.user._id
         const article = await articlesRepositories.saveArticle(req.body);
         return res.status(201).json({
@@ -66,6 +68,20 @@ const createNewArticle = async (req: any, res: Response): Promise<any> => {
         })
     }
 }
+
+const generateSlug = (title: string) => {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const time = Date.now();
+
+    const baseSlug = slugify(title, {
+        lower: true,
+        strict: true,
+    });
+
+    return `${year}-${month}-${baseSlug}-${time}`;
+};
 
 const requestArticleEditAccess = async (req: any, res: Response, next: NextFunction): Promise<any> => {
     try {
