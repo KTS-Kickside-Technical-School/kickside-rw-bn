@@ -20,6 +20,9 @@ workersRoute.get("/get-all-users", userAuthorization(["Admin"]), workerscontroll
 workersRoute.put("/disable-user", userAuthorization(["Admin"]), bodyValidation(disableUserSchema), isUserExistsById, workerscontroller.disableUser);
 workersRoute.put("/enable-user/:userId", userAuthorization(["Admin"]), isUserExistsById, workerscontroller.enableUser);
 workersRoute.put("/update-user", userAuthorization(["Admin"]), bodyValidation(updateUserSchema), isUserExistsById, workerscontroller.updateUser);
-workersRoute.put("/update-user-role", userAuthorization(["Admin"]), bodyValidation(updateRoleSchema), isUserExistsById, workerscontroller.updateUserRole)
+workersRoute.put("/update-user-role", userAuthorization(["Admin"]), bodyValidation(updateRoleSchema), isUserExistsById, workerscontroller.updateUserRole);
+
+workersRoute.post("/forgot-password", workerscontroller.forgotPassword)
+workersRoute.post ("/reset-password", workerscontroller.resetPassword)
 
 export default workersRoute
