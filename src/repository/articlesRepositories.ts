@@ -54,6 +54,11 @@ const saveArticleComment = async (data: any) => {
     return await ArticleComment.create(data)
 }
 
+const deleteArticle = async(_id: string) =>{
+    return await Article.findByIdAndDelete(_id)
+}
+
+
 export default {
     findAllArticles,
     findPublishedArticles,
@@ -66,5 +71,6 @@ export default {
     getArticleComments,
     findArticlesEditRequests,
     editArticleEditRequest,
-    saveArticleComment
+    saveArticleComment,
+    deleteArticle
 }
