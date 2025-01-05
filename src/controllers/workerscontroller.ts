@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import workersRepositories from '../repository/workersRepositories';
-import crypto from 'crypto';
+import jwt from 'jsonwebtoken'
 import { NextFunction, Request, Response } from 'express';
 import { createUserSchema } from '../validations/workersValidations';
 import mongoose from 'mongoose';
@@ -197,5 +197,8 @@ export default {
     disableUser,
     enableUser,
     updateUser,
-    updateUserRole
+    updateUserRole,
 }
+
+
+

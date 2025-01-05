@@ -32,7 +32,7 @@ const userSchema = new Schema({
         default: null,
         required: false
     },
-    resetPaaswordToken:{
+    resetPasswordToken:{
         type: String,
         default: null
     },

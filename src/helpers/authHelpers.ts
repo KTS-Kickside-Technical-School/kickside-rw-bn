@@ -9,12 +9,17 @@ export const generateToken = async (_id: any) => {
     return await jwt.sign({ _id }, process.env.JWT_SECRET);
 };
 
-export const decodeToken = (token: string) => {
-    const secret = process.env.JWT_SECRET;
-    if (!secret) {
-        throw new Error("JWT_SECRET is not defined in the environment variables.");
+export const decodeToken = (token: string): any | null => {
+    try {
+        const secret = process.env.JWT_SECRET;
+        if (!secret) {
+            throw new Error("JWT_SECRET is not defined in the environment variables.");
+        }
+        return jwt.verify(token, secret);
+    } catch (error) {
+        console.error("Token verification error:", error.message);
+        return null;
     }
-    return jwt.verify(token, secret);
 };
 
 export const comparePassword = async (password: string, hashedPassword: string) => {
