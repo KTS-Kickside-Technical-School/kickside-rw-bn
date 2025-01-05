@@ -6,6 +6,9 @@ import authControllers from '../controllers/authControllers';
 
 const authRoute = express.Router();
 
-authRoute.post("/login", bodyValidation(userLoginSchema), isUserExists, authControllers.userLogin)
+authRoute.post("/login", bodyValidation(userLoginSchema), isUserExists, authControllers.userLogin);
+
+authRoute.post("/forgot-password", authControllers.forgotPassword)
+authRoute.post ("/reset-password", authControllers.resetPassword)
 
 export default authRoute

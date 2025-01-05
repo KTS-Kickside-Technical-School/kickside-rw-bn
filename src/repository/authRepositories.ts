@@ -13,8 +13,15 @@ const findSessionByUserIdAndToken = async (user: any, content: any) => {
     return await Session.findOne({ user, content })
 }
 
+export const updateUser = async(userId: string, updateData: any) =>{
+    return await User.findByIdAndUpdate(userId, updateData, {new: true})
+
+
+}
+
 export default {
     findUserByAttribute,
     saveSession,
-    findSessionByUserIdAndToken
+    findSessionByUserIdAndToken,
+    updateUser
 }

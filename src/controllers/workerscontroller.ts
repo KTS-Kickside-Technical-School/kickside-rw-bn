@@ -191,37 +191,6 @@ export const updateUserRole = async (req: any, res: Response): Promise<any> => {
     };
 };
 
-
-export const resetPassword = async(req: any, res: Response):Promise<any> => {
-    try {
-        const {token, newPassword} = req.body
-
-        const decode: any = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await workersRepositories.findWorkerByAttribute("_id",decode.userId )
-        if (!user){
-            return res.status(404).json({
-                status: 404,
-                message: "Invalid token  or user not found"
-            })
-        };
-
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-        user.password= hashedPassword;
-        await user.save();
-
-        return res.status(200).json({
-            status: 200,
-            message: "Password reset successsfully"
-        })
-    } catch (error) {
-        return res.status(500).json({
-            status: 500,
-            message: error.message
-        })
-        
-    };
-
-};
 export default {
     createUserController,
     getAllWorkers,
@@ -229,7 +198,6 @@ export default {
     enableUser,
     updateUser,
     updateUserRole,
-    resetPassword
 }
 
 

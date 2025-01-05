@@ -5,6 +5,7 @@ import { sendEmail } from "../service/emailService";
 import user from "../database/models/user";
 import jwt from 'jsonwebtoken'
 import User from "../database/models/user";
+import bcrypt from 'bcrypt'
 
 const userLogin = async (req: any, res: Response): Promise<any> => {
     try {
@@ -81,7 +82,38 @@ export const forgotPassword = async(req: any, res: Response): Promise<any> =>{
     }
 };
 
+export const resetPassword = async(req: any, res: Response):Promise<any> => {
+    try {
+        const {token, newPassword} = req.body
+
+        const decode: any = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await authRepositories.findUserByAttribute("_id",decode.userId )
+        if (!user){
+            return res.status(404).json({
+                status: 404,
+                message: "Invalid token  or user not found"
+            })
+        };
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10)
+        await authRepositories.updateUser(decode.userId, { password: hashedPassword });
+
+        return res.status(200).json({
+            status: 200,
+            message: "Password reset successsfully"
+        })
+    } catch (error) {
+        return res.status(500).json({
+            status: 500,
+            message: error.message
+        })
+        
+    };
+
+};
+
 export default {
     userLogin,
-    forgotPassword
+    forgotPassword,
+    resetPassword
 }

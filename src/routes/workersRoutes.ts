@@ -1,6 +1,6 @@
 import express from 'express'
 import workerscontroller from '../controllers/workerscontroller'
-import authControllers from '../controllers/authControllers'
+
 import {
     createUserSchema,
     disableUserSchema,
@@ -23,7 +23,6 @@ workersRoute.put("/enable-user/:userId", userAuthorization(["Admin"]), isUserExi
 workersRoute.put("/update-user", userAuthorization(["Admin"]), bodyValidation(updateUserSchema), isUserExistsById, workerscontroller.updateUser);
 workersRoute.put("/update-user-role", userAuthorization(["Admin"]), bodyValidation(updateRoleSchema), isUserExistsById, workerscontroller.updateUserRole);
 
-workersRoute.post("/forgot-password", authControllers.forgotPassword)
-workersRoute.post ("/reset-password", workerscontroller.resetPassword)
+
 
 export default workersRoute
