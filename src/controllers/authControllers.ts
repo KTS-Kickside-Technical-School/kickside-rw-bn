@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { comparePassword, generateToken } from "../helpers/authHelpers";
+import { comparePassword, decodeToken, generateToken } from "../helpers/authHelpers";
 import authRepositories from "../repository/authRepositories";
 import { sendEmail } from "../service/emailService";
 import user from "../database/models/user";
@@ -23,7 +23,7 @@ const userLogin = async (req: any, res: Response): Promise<any> => {
                 message: "Your account has been disabled. Please contact the administrator."
             })
         }
-        
+
         const token = await generateToken(req.user._id);
         const session = await authRepositories.saveSession({
             user: req.user._id,
@@ -53,50 +53,67 @@ const userLogin = async (req: any, res: Response): Promise<any> => {
     }
 };
 
-export const forgotPassword = async(req: any, res: Response): Promise<any> =>{
+export const forgotPassword = async (req: any, res: Response): Promise<any> => {
     try {
-        const {email}= req.body
-        const user = await User.findOne({ email });
+        const { email } = req.body
 
-        const resetToken = jwt.sign({userId: user._id}, process.env.JWT_SECRET, {expiresIn: "1h"})
-        const reseLink = `https://www.kickside.rw/reset-password?token=${resetToken}`
-        await sendEmail(email, "Password reset request", 'Password Reset Process',
-            `<p>Click <a href="${reseLink}">here</a> to reset your password. This link expires in 1 hour.</p>
-            If you have any questions or require assistance, feel free to reach out.
+        const resetToken = await generateToken(req.user._id);
+        const session = await authRepositories.saveSession({ user: req.user._id, content: resetToken });
+        const reseLink = `${process.env.CLIENT_URL}/reset-password?token=${resetToken}`
+        await sendEmail(email, "Password reset requested", 'Password Reset Process',
+            `<p>You have request to reset your password,
+             click  <a href="${reseLink}">here</a> to reset your password. This link expires in 1 hour.</p>
             <br/>
             Best regards,
             <br/>
-            Kickside Rwanda Team
+           <b> Kickside Rwanda Team</b>
             </p>`
         )
+
         return res.status(200).json({
             status: 200,
-            message: "Password reset email sent successfully"
+            message: "Password reset email sent successfully",
+            data: { session }
         })
     } catch (error) {
         return res.status(500).json({
             status: 500,
             message: error.messsage
         })
-        
     }
 };
 
-export const resetPassword = async(req: any, res: Response):Promise<any> => {
+export const resetPassword = async (req: any, res: Response): Promise<any> => {
     try {
-        const {token, newPassword} = req.body
+        const { token, password } = req.body
+        const decoded: any = decodeToken(token);
 
-        const decode: any = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await authRepositories.findUserByAttribute("_id",decode.userId )
-        if (!user){
-            return res.status(404).json({
-                status: 404,
+        if (!decoded || !decoded._id) {
+            return res.status(400).json({
+                status: 400,
+                message: "Invalid or expired token"
+            });
+        }
+
+        const user = await authRepositories.findUserByAttribute("_id", decoded._id)
+        if (!user) {
+            return res.status(400).json({
+                status: 400,
                 message: "Invalid token  or user not found"
             })
         };
 
-        const hashedPassword = await bcrypt.hash(newPassword, 10)
-        await authRepositories.updateUser(decode.userId, { password: hashedPassword });
+        const session = await authRepositories.findSessionByUserIdAndToken(user._id, token);
+
+        if (!session) {
+            return res.status(400).json({ status: 400, message: "Token expired or invalid" });
+        }
+
+        await authRepositories.deleteSession(session._id);
+
+        const hashedPassword = await bcrypt.hash(password, 10)
+
+        await authRepositories.updateUser(user._id, { password: hashedPassword });
 
         return res.status(200).json({
             status: 200,
@@ -107,7 +124,7 @@ export const resetPassword = async(req: any, res: Response):Promise<any> => {
             status: 500,
             message: error.message
         })
-        
+
     };
 
 };
