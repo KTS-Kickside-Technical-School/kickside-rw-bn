@@ -32,14 +32,21 @@ const userSchema = new Schema({
         default: null,
         required: false
     },
-    resetPasswordToken:{
+    rank: {
         type: String,
-        default: null
+        default: null,
+        required: false
     },
-    resetPasswordExpires:{
-        type: Date,
-        default: null
-    }
+    bio: {
+        type: String,
+        default: null,
+        required: false
+    },
+    profile: {
+        type: String,
+        default: null,
+        required: false
+       }
 }, { timestamps: true })
 
 const User = mongoose.model('User', userSchema)
