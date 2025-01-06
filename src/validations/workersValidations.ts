@@ -24,3 +24,10 @@ export const updateRoleSchema = Joi.object({
     _id: Joi.string().required(),
     role: Joi.string().valid('Journalist', 'Editor', 'Admin').required()
 })
+
+export const updateProfileSchema = Joi.object({
+    firstName: Joi.string(),
+    lastName: Joi.string(),
+    email: Joi.string(),
+    password: Joi.string(),
+})

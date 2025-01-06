@@ -16,11 +16,16 @@ const findAllWorkers = async (filter: object = {}, sort: string = 'createdAt', s
 
 const updateUser = async (id: any, data: any) => {
     return await User.findByIdAndUpdate(id, data, { new: true })
+};
+
+const getUserById = async(id: any) =>{
+    return await User.findById(id)
 }
 
 export default {
     findWorkerByAttribute,
     createUser,
     findAllWorkers,
-    updateUser
+    updateUser,
+    getUserById
 }

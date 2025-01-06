@@ -191,6 +191,41 @@ export const updateUserRole = async (req: any, res: Response): Promise<any> => {
     };
 };
 
+export const getUserProfile = async(req: any, res: Response): Promise<any> =>{
+    try {
+        const user = await workersRepositories.getUserById(req.user._id);
+        return res.status(200).json({
+            status: 200,
+            message: "User Profile Fetched Successfully",
+            data: {user}
+        })
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            message: error.message
+        })
+        
+    }
+};
+
+export const updateUserProfile = async(req: any, res: Response): Promise<any> =>{
+    try {
+        const userId = req.user._id
+        const updatedProfile = await workersRepositories.updateUser(userId, req.body);
+        return res.status(200).json({
+            status: 200,
+            message: "User profile updated successfully",
+            data: {updatedProfile}
+        })
+    } catch (error) {
+        return res.status(500).json({
+            status: 500,
+            message: error.message
+        })
+        
+    }
+}
+
 export default {
     createUserController,
     getAllWorkers,
@@ -198,7 +233,6 @@ export default {
     enableUser,
     updateUser,
     updateUserRole,
+    getUserProfile,
+    updateUserProfile
 }
-
-
-
