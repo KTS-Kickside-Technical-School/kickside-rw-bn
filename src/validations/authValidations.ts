@@ -23,4 +23,6 @@ export const updateProfileSchema = Joi.object({
     lastName: Joi.string(),
     email: Joi.string(),
     password: Joi.string(),
+    bio: Joi.string(),
+    profile: Joi.string(),
 })

@@ -146,7 +146,8 @@ const userLogout = async (req: any, res: Response): Promise<any> => {
 
 export const getUserProfile = async(req: any, res: Response): Promise<any> =>{
     try {
-        const user = await authRepositories.getUserById(req.user._id);
+        const user = req.user;
+        
         return res.status(200).json({
             status: 200,
             message: "User Profile Fetched Successfully",

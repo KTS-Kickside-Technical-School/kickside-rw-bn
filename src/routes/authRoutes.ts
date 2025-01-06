@@ -14,7 +14,9 @@ authRoute.post("/forgot-password", bodyValidation(forgotPasswordSchema), isUserE
 authRoute.post("/reset-password", bodyValidation(resetPasswordSchema), authControllers.resetPassword)
 
 authRoute.post("/logout", userAuthorization(["Admin", "Journalist", "Editor"]), authControllers.userLogout)
-export default authRoute
 
 authRoute.get("/get-profile", userAuthorization(["Admin", "Journalist", "Editor"]), authControllers.getUserProfile);
 authRoute.put("/update-profile", userAuthorization(["Admin", "Editor", "Journalist"]), bodyValidation(updateProfileSchema), isInformationChanged,authControllers.updateUserProfile )
+
+export default authRoute
+
