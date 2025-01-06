@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { comparePassword, decodeToken, generateToken } from "../helpers/authHelpers";
+import { comparePassword, decodeToken, destroyToken, generateToken } from "../helpers/authHelpers";
 import authRepositories from "../repository/authRepositories";
 import { sendEmail } from "../service/emailService";
 import user from "../database/models/user";
@@ -53,13 +53,13 @@ const userLogin = async (req: any, res: Response): Promise<any> => {
     }
 };
 
-export const forgotPassword = async (req: any, res: Response): Promise<any> => {
+const forgotPassword = async (req: any, res: Response): Promise<any> => {
     try {
         const { email } = req.body
 
         const resetToken = await generateToken(req.user._id);
         const session = await authRepositories.saveSession({ user: req.user._id, content: resetToken });
-        const reseLink = `${process.env.CLIENT_URL}/reset-password?token=${resetToken}`
+        const reseLink = `${process.env.CLIENT_URL}/staff/reset-password?token=${resetToken}`
         await sendEmail(email, "Password reset requested", 'Password Reset Process',
             `<p>You have request to reset your password,
              click  <a href="${reseLink}">here</a> to reset your password. This link expires in 1 hour.</p>
@@ -83,7 +83,7 @@ export const forgotPassword = async (req: any, res: Response): Promise<any> => {
     }
 };
 
-export const resetPassword = async (req: any, res: Response): Promise<any> => {
+const resetPassword = async (req: any, res: Response): Promise<any> => {
     try {
         const { token, password } = req.body
         const decoded: any = decodeToken(token);
@@ -124,13 +124,29 @@ export const resetPassword = async (req: any, res: Response): Promise<any> => {
             status: 500,
             message: error.message
         })
-
     };
-
 };
+
+const userLogout = async (req: any, res: Response): Promise<any> => {
+    try {
+        await destroyToken(req.session.content)
+        await authRepositories.deleteSession(req.session._id)
+
+        return res.status(200).json({
+            status: 200,
+            message: "Logout successful"
+        })
+    } catch (error) {
+        return res.status(500).json({
+            status: 500,
+            message: error.message,
+        })
+    }
+}
 
 export default {
     userLogin,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    userLogout
 }

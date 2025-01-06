@@ -18,10 +18,20 @@ export const decodeToken = (token: string): any | null => {
         return jwt.verify(token, secret);
     } catch (error) {
         console.error("Token verification error:", error.message);
-        return null;
+        return { status: 401, message: "Token verification failed" };
     }
 };
 
 export const comparePassword = async (password: string, hashedPassword: string) => {
     return await bcrypt.compare(password, hashedPassword);
 }
+
+const blacklist = new Set<string>();
+
+export const destroyToken = async (token: string) => {
+    blacklist.add(token); // Add token to the blacklist
+};
+
+export const isTokenBlacklisted = (token: string): boolean => {
+    return blacklist.has(token);
+};
