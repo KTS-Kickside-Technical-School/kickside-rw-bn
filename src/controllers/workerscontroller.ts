@@ -191,6 +191,7 @@ export const updateUserRole = async (req: any, res: Response): Promise<any> => {
     };
 };
 
+
 export default {
     createUserController,
     getAllWorkers,
@@ -199,6 +200,3 @@ export default {
     updateUser,
     updateUserRole,
 }
-
-
-

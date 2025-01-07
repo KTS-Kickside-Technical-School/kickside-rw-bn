@@ -5,7 +5,7 @@ import {
     createUserSchema,
     disableUserSchema,
     updateRoleSchema,
-    updateUserSchema
+    updateUserSchema,
 } from '../validations/workersValidations'
 import bodyValidation from '../middlewares/bodyValidation'
 import { userAuthorization } from '../middlewares/authorization'

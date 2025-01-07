@@ -142,11 +142,49 @@ const userLogout = async (req: any, res: Response): Promise<any> => {
             message: error.message,
         })
     }
+};
+
+export const getUserProfile = async(req: any, res: Response): Promise<any> =>{
+    try {
+        const user = req.user;
+        
+        return res.status(200).json({
+            status: 200,
+            message: "User Profile Fetched Successfully",
+            data: {user}
+        })
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            message: error.message
+        })
+        
+    }
+};
+
+export const updateUserProfile = async(req: any, res: Response): Promise<any> =>{
+    try {
+        const userId = req.user._id
+        const updatedProfile = await authRepositories.updateUser(userId, req.body);
+        return res.status(200).json({
+            status: 200,
+            message: "User profile updated successfully",
+            data: {updatedProfile}
+        })
+    } catch (error) {
+        return res.status(500).json({
+            status: 500,
+            message: error.message
+        })
+        
+    }
 }
 
 export default {
     userLogin,
     forgotPassword,
     resetPassword,
-    userLogout
+    userLogout,
+    getUserProfile,
+    updateUserProfile
 }

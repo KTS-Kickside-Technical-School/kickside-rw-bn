@@ -19,12 +19,18 @@ export const updateUser = async (userId: any, updateData: any) => {
 
 export const deleteSession = async (sessionId: any) => {
     return await Session.findByIdAndDelete(sessionId)
-}
+};
+
+const getUserById = async(id: any) =>{
+    return await User.findById(id)
+};
+
 
 export default {
     findUserByAttribute,
     saveSession,
     findSessionByUserIdAndToken,
     updateUser,
-    deleteSession
+    deleteSession,
+    getUserById
 }

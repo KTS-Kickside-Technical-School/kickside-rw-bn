@@ -16,4 +16,13 @@ export const resetPasswordSchema = Joi.object({
 
 export const logoutSchema = Joi.object({
     token: Joi.string().required()
+});
+
+export const updateProfileSchema = Joi.object({
+    firstName: Joi.string(),
+    lastName: Joi.string(),
+    email: Joi.string(),
+    password: Joi.string(),
+    bio: Joi.string(),
+    profile: Joi.string(),
 })
