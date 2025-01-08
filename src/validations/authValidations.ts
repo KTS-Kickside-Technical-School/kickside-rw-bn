@@ -19,10 +19,11 @@ export const logoutSchema = Joi.object({
 });
 
 export const updateProfileSchema = Joi.object({
-    firstName: Joi.string(),
-    lastName: Joi.string(),
-    email: Joi.string(),
-    password: Joi.string(),
-    bio: Joi.string(),
-    profile: Joi.string(),
-})
+    firstName: Joi.string().optional(),
+    lastName: Joi.string().optional(),
+    email: Joi.string().optional(),
+    password: Joi.string().optional(),
+    bio: Joi.string().optional(),
+    profile: Joi.string().optional(),
+    phone: Joi.string().optional()
+});

@@ -43,7 +43,7 @@ const getArticleComments = async (article: any) => {
 }
 
 const findArticlesEditRequests = async () => {
-    return ArticlesEditRequest.find()
+    return ArticlesEditRequest.find().populate('journalist').populate('article').sort({ isAccepted: 1 })
 }
 
 const editArticleEditRequest = async (_id: any, data: any) => {
@@ -54,7 +54,7 @@ const saveArticleComment = async (data: any) => {
     return await ArticleComment.create(data)
 }
 
-const deleteArticle = async(_id: string) =>{
+const deleteArticle = async (_id: string) => {
     return await Article.findByIdAndDelete(_id)
 }
 

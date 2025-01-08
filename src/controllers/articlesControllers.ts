@@ -105,6 +105,7 @@ const requestArticleEditAccess = async (req: any, res: Response, next: NextFunct
 
 const editArticle = async (req: any, res: Response): Promise<any> => {
     try {
+        req.body.status = "unpublished";
         const article = await articlesRepositories.editArticle(req.article._id, req.body);
         return res.status(200).json({
             status: 200,
