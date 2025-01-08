@@ -34,12 +34,14 @@ const getOwnArticles = async (req: any, res: Response): Promise<any> => {
 
 const getSingleArticle = async (req: any, res: Response): Promise<any> => {
     try {
+        const article = req.article
+        const views = await articlesRepositories.incrementViews(article)
         return res.status(200).json({
             status: 200,
             message: "Article retrieved successfully",
             data:
             {
-                article: req.article,
+                article: views,
                 comments: req.comments
             }
         })

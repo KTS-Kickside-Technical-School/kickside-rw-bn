@@ -56,6 +56,12 @@ const saveArticleComment = async (data: any) => {
 
 const deleteArticle = async(_id: string) =>{
     return await Article.findByIdAndDelete(_id)
+};
+
+const incrementViews = async(_id: string) =>{
+    const article = await Article.findById(_id)
+    article.views += 1
+    return await article.save()
 }
 
 
@@ -72,5 +78,6 @@ export default {
     findArticlesEditRequests,
     editArticleEditRequest,
     saveArticleComment,
-    deleteArticle
+    deleteArticle,
+    incrementViews
 }

@@ -36,6 +36,11 @@ const articleSchema = new Schema({
         type: String,
         required: true,
         default: 'unpublished'
+    },
+
+    views:{
+        type: Number,
+        default: 0
     }
 }, { timestamps: true })
 
