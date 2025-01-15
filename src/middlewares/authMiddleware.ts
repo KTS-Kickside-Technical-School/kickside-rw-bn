@@ -41,29 +41,3 @@ export const isUserExistsById = async (req: any, res: Response, next: NextFuncti
         })
     }
 };
-
-export const isInformationChanged = async (req: any, res: Response, next: NextFunction): Promise<any> => {
-    try {
-        const userId = req.user._id
-        const existingUser = await authRepositories.getUserById(userId);
-
-        const updates= req.body
-        const updatedKeys = Object.keys(updates)
-        const hasChanged = updatedKeys.some(Key=> updates[Key] !== existingUser[Key])
-        if(!hasChanged){
-            return res.status(400).json({
-                status: 400,
-                message: "No change detected",
-                data: {
-                    existingUser
-                }
-            })
-        }
-        return next()
-    } catch (error) {
-        res.status(500).json({
-            status: 500,
-            message: error.message
-        })
-    }
-}

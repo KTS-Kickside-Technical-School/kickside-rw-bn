@@ -2,8 +2,7 @@ import mongoose, { Schema } from "mongoose"
 
 const userSchema = new Schema({
     firstName: {
-        type: String,
-        required: true
+        type: String
     },
     lastName: {
         type: String,
@@ -22,12 +21,12 @@ const userSchema = new Schema({
         type: Object,
         required: true
     },
-    isDisabled:{
+    isDisabled: {
         type: Boolean,
         default: false,
         required: false
     },
-    disableReason:{
+    disableReason: {
         type: String,
         default: null,
         required: false
@@ -46,7 +45,12 @@ const userSchema = new Schema({
         type: String,
         default: null,
         required: false
-       }
+    },
+    phone: {
+        type: String,
+        default: null,
+        required: false
+    }
 }, { timestamps: true })
 
 const User = mongoose.model('User', userSchema)

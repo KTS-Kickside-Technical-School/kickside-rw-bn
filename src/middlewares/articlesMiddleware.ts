@@ -107,7 +107,7 @@ export const isArticleOwned = async (req: any, res: any, next: NextFunction): Pr
 
 export const isArticleEditRequestAlreadyExists = async (req: any, res: Response, next: NextFunction): Promise<any> => {
     try {
-        const editRequest = await articlesRepositories.findArticleEditRequestByAttribute("journalist", req.user._id);
+        const editRequest = await articlesRepositories.findArticleEditRequestByAttribute("article", req.article._id);
 
         if (editRequest && editRequest.isAccepted === false) {
             return res.status(400).json({

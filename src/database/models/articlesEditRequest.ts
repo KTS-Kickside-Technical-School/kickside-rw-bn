@@ -8,7 +8,7 @@ const articlesEditRequestsSchema = new Schema({
     },
     journalist: {
         type: mongoose.Types.ObjectId,
-        ref: "Journalist",
+        ref: "User",
         required: true
     },
     isAccepted: {
