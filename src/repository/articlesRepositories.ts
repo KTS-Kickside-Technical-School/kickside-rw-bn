@@ -1,6 +1,11 @@
+import { title } from "process";
 import Article from "../database/models/article"
 import ArticleComment from "../database/models/articleComment";
 import ArticlesEditRequest from "../database/models/articlesEditRequest";
+
+import articleView from "../database/models/articleView";
+import article from "../database/models/article";
+import { Promise } from "mongoose";
 
 const findPublishedArticles = async () => {
     return Article.find({ status: 'published' })
@@ -62,7 +67,121 @@ const incrementViews = async(_id: string) =>{
     const article = await Article.findById(_id)
     article.views += 1
     return await article.save()
-}
+};
+
+const getArticleAnalysis = async () => {
+    try {
+        const articles = await Article.find();
+
+        if (!Array.isArray(articles) || articles.length === 0) {
+            throw new Error("No articles found in the database");
+        }
+
+        const analytics = [];
+        for (const article of articles) {
+            const views = await articleView.find({ article: article._id }).countDocuments();
+
+            analytics.push({
+                articleId: article._id,
+                title: article.title,
+                author: article.author,
+                totalViews: views,
+            });
+        }
+        return analytics;
+    } catch (error) {
+        throw error;
+    }
+};
+
+const getArticleAnalysisByAuthor = async () => {
+    try {
+        const viewsByArticles = await articleView.aggregate([
+            
+            {
+                $lookup: {
+                    from: "articles",
+                    localField: "article",
+                    foreignField: "_id",
+                    as: "articleDetails",
+                },
+            },
+            {
+                $unwind: "$articleDetails",
+            },
+            
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "articleDetails.author",
+                    foreignField: "_id",
+                    as: "authorDetails",
+                },
+            },
+            {
+                $unwind: "$authorDetails",
+            },
+            
+            {
+                $group: {
+                    _id: {
+                        author: "$articleDetails.author",
+                        article: "$articleDetails._id",
+                    },
+                    author: { $first: "$authorDetails" }, 
+                    article: { $first: "$articleDetails" }, 
+                    viewCountFromLogs: { $sum: 1 }, 
+                },
+            },
+            
+            {
+                $addFields: {
+                    totalViews: {
+                        $add: ["$article.views"], 
+                    },
+                },
+            },
+            
+            {
+                $group: {
+                    _id: "$_id.author", 
+                    author: { $first: "$author" },
+                    totalViews: { $sum: "$totalViews" }, 
+                    totalArticles: { $sum: 1 },
+                    articles: {
+                        $push: {
+                            articleId: "$article._id",
+                            title: "$article.title",
+                            views: "$article.views",
+                        },
+                    },
+                },
+            },
+        
+            {
+                $project: {
+                    _id: 0,
+                    author: {
+                        id: "$author._id",
+                        name: {
+                            $concat: ["$author.firstName", " ", "$author.lastName"],
+                        },
+                        email: "$author.email",
+                    },
+                    totalViews: 1,
+                    totalArticles: 1,
+                    articles: 1,
+                },
+            },
+        ]);
+
+        return viewsByArticles;
+    } catch (error) {
+        console.error("Error in getArticleAnalysisByAuthor:", error.message);
+        throw error;
+    }
+};
+
 
 
 export default {
@@ -79,5 +198,8 @@ export default {
     editArticleEditRequest,
     saveArticleComment,
     deleteArticle,
-    incrementViews
+    incrementViews,
+
+    getArticleAnalysis,
+    getArticleAnalysisByAuthor
 }

@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import slugify from 'slugify';
 import articlesRepositories from "../repository/articlesRepositories"
+import articleView from "../database/models/articleView";
 
 const getPublishedArticles = async (req: Request, res: Response): Promise<any> => {
     try {
@@ -35,6 +36,9 @@ const getOwnArticles = async (req: any, res: Response): Promise<any> => {
 const getSingleArticle = async (req: any, res: Response): Promise<any> => {
     try {
         const article = req.article
+
+        await new articleView({article: article._id}).save()
+
         const views = await articlesRepositories.incrementViews(article)
         return res.status(200).json({
             status: 200,
@@ -225,6 +229,41 @@ const deleteArticle = async (req: any, res: Response, next: NextFunction): Promi
         })
 
     }
+};
+
+const getArticleViewAnalysis = async(req: any, res: Response): Promise<any> =>{
+    try {
+        const analytics = await articlesRepositories.getArticleAnalysis();
+        return res.status(200).json({
+            status: 200,
+            message: "Article Analytics",
+            analysis: analytics
+        })
+    } catch (error) {
+        return res.status(500).json({
+            status: 500,
+            message: error.message
+        })
+        
+    }
+};
+
+const getArticleViewAnalysisByAuthor =  async(req: any, res: Response): Promise<any> =>{
+    try {
+        const analytics = await articlesRepositories.getArticleAnalysisByAuthor();
+        return res.status(200).json({
+            status: 200,
+            message: "Article View Analysis By Author",
+            data: analytics
+        })
+        
+    } catch (error) {
+        return res.status(500).json({
+            status: 500,
+            message: error.message
+        })
+        
+    }
 }
 
 
@@ -240,5 +279,8 @@ export default {
     getAllArticlesEditRequests,
     approveArticlesEditRequests,
     postArticleComment,
-    deleteArticle
+    deleteArticle,
+
+    getArticleViewAnalysis,
+    getArticleViewAnalysisByAuthor
 }
