@@ -34,14 +34,21 @@ const getOwnArticles = async (req: any, res: Response): Promise<any> => {
 
 const getSingleArticle = async (req: any, res: Response): Promise<any> => {
     try {
-        const article = req.article
-        const views = await articlesRepositories.incrementViews(article)
+        let article = req.article
+        await articlesRepositories.saveArticleViewsRecord({ article: article._id });
+
+        const newViews = article.views + 1
+        console.log(newViews)
+        await articlesRepositories.editArticle(article._id, { views: newViews });
+
+        article = await articlesRepositories.findArticleByAttribute("_id", article._id)
+
         return res.status(200).json({
             status: 200,
             message: "Article retrieved successfully",
             data:
             {
-                article: views,
+                article: article,
                 comments: req.comments
             }
         })

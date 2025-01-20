@@ -37,7 +37,6 @@ const articleSchema = new Schema({
         required: true,
         default: 'unpublished'
     },
-
     views:{
         type: Number,
         default: 0

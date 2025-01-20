@@ -1,6 +1,7 @@
 import Article from "../database/models/article"
 import ArticleComment from "../database/models/articleComment";
 import ArticlesEditRequest from "../database/models/articlesEditRequest";
+import ArticleView from "../database/models/articlesViews";
 
 const findPublishedArticles = async () => {
     return Article.find({ status: 'published' })
@@ -54,14 +55,12 @@ const saveArticleComment = async (data: any) => {
     return await ArticleComment.create(data)
 }
 
-const deleteArticle = async(_id: string) =>{
+const deleteArticle = async (_id: string) => {
     return await Article.findByIdAndDelete(_id)
 };
 
-const incrementViews = async(_id: string) =>{
-    const article = await Article.findById(_id)
-    article.views += 1
-    return await article.save()
+const saveArticleViewsRecord = async (data: any) => {
+    return await ArticleView.create(data)
 }
 
 
@@ -79,5 +78,5 @@ export default {
     editArticleEditRequest,
     saveArticleComment,
     deleteArticle,
-    incrementViews
+    saveArticleViewsRecord
 }
