@@ -17,6 +17,7 @@ const userLogin = async (req: any, res: Response): Promise<any> => {
                 message: "Email or Password is not correct.",
             })
         }
+        
         if (req.user.isDisabled === true) {
             return res.status(401).json({
                 status: 401,
