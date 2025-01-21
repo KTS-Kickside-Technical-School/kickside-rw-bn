@@ -48,7 +48,7 @@ export const createUserController = async (req: any, res: Response, next: NextFu
 
 export const getAllWorkers = async (req: any, res: Response, next: NextFunction): Promise<any> => {
     try {
-        const workers = await workersRepositories.findAllWorkers();
+        const workers = await workersRepositories.findAllWorkers(req.user._id);
 
         return res.status(200).json({
             status: 200,
@@ -192,6 +192,22 @@ export const updateUserRole = async (req: any, res: Response): Promise<any> => {
 };
 
 
+export const getSingleWorker = async (req: any, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        return res.status(200).json({
+            status: 200,
+            message: "Workers Retrieved Successfully",
+            data: { worker: req.user }
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            message: error.message
+        })
+    }
+};
+
+
 export default {
     createUserController,
     getAllWorkers,
@@ -199,4 +215,5 @@ export default {
     enableUser,
     updateUser,
     updateUserRole,
+    getSingleWorker
 }
