@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import articlesRepositories from "../repository/articlesRepositories"
 import mongoose from "mongoose";
+import Article from "../database/models/article";
 
 
 
@@ -170,7 +171,28 @@ export const isArticleEditRequestExistsAndPending = async (req: any, res: Respon
         })
     }
 }
+
 export const isArticleHaveComments = async (article: any) => {
     const comments = await articlesRepositories.getArticleComments(article);
     return comments
 }
+
+export const isAreticlesExistsByCategory = async (req: any, res: Response, next: NextFunction): Promise<any> => {
+    const { category } = req.params
+    if (!category) {
+        return res.status(400).json({
+            status: 400,
+            message: "Category is required"
+        })
+    };
+    const articles = await articlesRepositories.findArticlesByAttribute("category", category)
+    if (!articles || articles.length === 0) {
+        return res.status(404).json({
+            status: 404,
+            message: `No articles found for: ${category}`
+        })
+    }
+    req.articles = articles
+    next();
+}
+
