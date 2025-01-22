@@ -7,7 +7,8 @@ import {
     isArticleEditRequestExistsAndPending,
     isArticleExists,
     isArticleExistsBySlug,
-    isArticleOwned
+    isArticleOwned,
+    isCategoryExist
 } from '../middlewares/articlesMiddleware';
 import bodyValidation from '../middlewares/bodyValidation';
 import { editArticleSchema, newArticleSchema, postArticleComment } from '../validations/articlesValidations';
@@ -32,5 +33,7 @@ articlesRoute.get("/get-single-article/:slug", isArticleExistsBySlug, articlesCo
 articlesRoute.post("/post-comments", bodyValidation(postArticleComment), isArticleExists, articlesControllers.postArticleComment);
 
 articlesRoute.delete("/delete-article/:id", userAuthorization(["Admin"]), isArticleExists, articlesControllers.deleteArticle);
+
+articlesRoute.get("/get-artile-by-category/:category",isCategoryExist, articlesControllers.getArtickeByCategory)
 
 export default articlesRoute;

@@ -61,8 +61,13 @@ const deleteArticle = async (_id: string) => {
 
 const saveArticleViewsRecord = async (data: any) => {
     return await ArticleView.create(data)
-}
+};
 
+const findArticleByCategory = async(category: string) =>{
+    return Article.find({ category: category.toLocaleLowerCase() })
+    .select("_id title author views category")
+    .populate("author", "firstName lastName email")
+}
 
 export default {
     findAllArticles,
@@ -78,5 +83,7 @@ export default {
     editArticleEditRequest,
     saveArticleComment,
     deleteArticle,
-    saveArticleViewsRecord
+    saveArticleViewsRecord,
+
+    findArticleByCategory
 }

@@ -235,6 +235,24 @@ const deleteArticle = async (req: any, res: Response, next: NextFunction): Promi
     }
 }
 
+const getArtickeByCategory =async(req: any, res: Response): Promise<any> =>{
+    try {
+        const{category} = req.params
+        const article = await articlesRepositories.findArticleByCategory(category)
+        return res.status(200).json({
+            status: 200,
+            messsage: `Articles in the "${category}" category `,
+            Articles: {article} 
+        })
+        
+    } catch (error) {
+        return res.status(500).json({
+            status: 500,
+            message: error.message
+        })
+        
+    }
+}
 
 export default {
     getPublishedArticles,
@@ -248,5 +266,7 @@ export default {
     getAllArticlesEditRequests,
     approveArticlesEditRequests,
     postArticleComment,
-    deleteArticle
+    deleteArticle,
+
+    getArtickeByCategory
 }
