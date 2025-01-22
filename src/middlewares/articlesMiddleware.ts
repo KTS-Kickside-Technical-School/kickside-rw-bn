@@ -177,21 +177,22 @@ export const isArticleHaveComments = async (article: any) => {
     return comments
 }
 
-export const isCategoryExist = async(req: any, res:Response, next: NextFunction):Promise<any> =>{
-        const {category} = req.params
-        if(!category){
-            return res.status(400).json({
-                status: 400,
-                message: "Category is required"
-            })
-        };
-        const categoryExist = await articlesRepositories.isCategoryExist(category)
-        if(!categoryExist){
-            return res.status(400).json({
-                status: 400,
-                message: `Category "${category}" does not exist in the articles database`
-            })
-        }
-        next();
+export const isAreticlesExistsByCategory = async (req: any, res: Response, next: NextFunction): Promise<any> => {
+    const { category } = req.params
+    if (!category) {
+        return res.status(400).json({
+            status: 400,
+            message: "Category is required"
+        })
+    };
+    const articles = await articlesRepositories.findArticlesByAttribute("category", category)
+    if (!articles || articles.length === 0) {
+        return res.status(404).json({
+            status: 404,
+            message: `No articles found for: ${category}`
+        })
     }
+    req.articles = articles
+    next();
+}
 

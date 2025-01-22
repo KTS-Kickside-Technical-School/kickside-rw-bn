@@ -235,22 +235,21 @@ const deleteArticle = async (req: any, res: Response, next: NextFunction): Promi
     }
 }
 
-const getArticlesByCategory =async(req: any, res: Response): Promise<any> =>{
+const getArticlesByCategory = async (req: any, res: Response): Promise<any> => {
     try {
-        const{category} = req.params
-        const articles = await articlesRepositories.findArticlesByCategory(category)
+        const { category } = req.params
         return res.status(200).json({
             status: 200,
             messsage: `Articles in the "${category}" category `,
-            articles: {articles} 
+            data: { articles: req.articles }
         })
-        
+
     } catch (error) {
         return res.status(500).json({
             status: 500,
             message: error.message
         })
-        
+
     }
 }
 

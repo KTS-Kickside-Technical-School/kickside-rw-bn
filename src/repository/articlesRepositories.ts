@@ -68,9 +68,6 @@ const findArticlesByCategory = async(category: string) =>{
     .select("_id title author views category")
     .populate("author", "firstName lastName email")
 }
-const isCategoryExist = async(category)=>{
-    return await Article.findOne({category:category})
-}
 
 export default {
     findAllArticles,
@@ -89,5 +86,4 @@ export default {
     saveArticleViewsRecord,
 
     findArticlesByCategory,
-    isCategoryExist
 }

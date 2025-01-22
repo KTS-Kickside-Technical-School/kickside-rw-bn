@@ -1,6 +1,7 @@
 import express from 'express';
 import articlesControllers from '../controllers/articlesControllers';
 import {
+    isAreticlesExistsByCategory,
     isArticleAlreadyExists,
     isArticleEditable,
     isArticleEditRequestAlreadyExists,
@@ -8,7 +9,6 @@ import {
     isArticleExists,
     isArticleExistsBySlug,
     isArticleOwned,
-    isCategoryExist
 } from '../middlewares/articlesMiddleware';
 import bodyValidation from '../middlewares/bodyValidation';
 import { editArticleSchema, newArticleSchema, postArticleComment } from '../validations/articlesValidations';
@@ -34,6 +34,6 @@ articlesRoute.post("/post-comments", bodyValidation(postArticleComment), isArtic
 
 articlesRoute.delete("/delete-article/:id", userAuthorization(["Admin"]), isArticleExists, articlesControllers.deleteArticle);
 
-articlesRoute.get("/get-articles-by-category/:category",isCategoryExist, articlesControllers.getArticlesByCategory)
+articlesRoute.get("/get-articles-by-category/:category",isAreticlesExistsByCategory, articlesControllers.getArticlesByCategory)
 
 export default articlesRoute;
