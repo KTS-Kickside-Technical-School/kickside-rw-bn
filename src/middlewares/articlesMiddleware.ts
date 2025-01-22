@@ -185,7 +185,7 @@ export const isCategoryExist = async(req: any, res:Response, next: NextFunction)
                 message: "Category is required"
             })
         };
-        const categoryExist = await Article.findOne({ category: category.toLocaleLowerCase() })
+        const categoryExist = await articlesRepositories.isCategoryExist(category)
         if(!categoryExist){
             return res.status(400).json({
                 status: 400,

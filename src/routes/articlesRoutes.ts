@@ -34,6 +34,6 @@ articlesRoute.post("/post-comments", bodyValidation(postArticleComment), isArtic
 
 articlesRoute.delete("/delete-article/:id", userAuthorization(["Admin"]), isArticleExists, articlesControllers.deleteArticle);
 
-articlesRoute.get("/get-artile-by-category/:category",isCategoryExist, articlesControllers.getArtickeByCategory)
+articlesRoute.get("/get-articles-by-category/:category",isCategoryExist, articlesControllers.getArticlesByCategory)
 
 export default articlesRoute;
