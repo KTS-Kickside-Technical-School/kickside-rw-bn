@@ -266,6 +266,5 @@ export default {
     approveArticlesEditRequests,
     postArticleComment,
     deleteArticle,
-
     getArticlesByCategory
 }

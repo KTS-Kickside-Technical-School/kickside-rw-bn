@@ -84,6 +84,5 @@ export default {
     saveArticleComment,
     deleteArticle,
     saveArticleViewsRecord,
-
     findArticlesByCategory,
 }
