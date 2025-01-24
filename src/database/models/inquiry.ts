@@ -23,8 +23,8 @@ const inquirySchema = new Schema({
     },
     status: {
         type: String,
-        enum: ["pending", "accepted", "solved"],
-        default: "unread"
+        enum: ["pending","solved"],
+        default: "pending"
     }
 }, {timestamps: true})
 

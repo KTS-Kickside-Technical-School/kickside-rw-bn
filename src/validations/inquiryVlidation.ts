@@ -6,9 +6,8 @@ export const inquirySchema = Joi.object({
     email: Joi.string().required(),
     topic: Joi.string().required(),
     message: Joi.string().required(),
-
 })
 
 export const updateInquirySchema = Joi.object({
-    status: Joi.string().required().valid("pending", "accepted", "solved")
+    status: Joi.string().required().valid("pending","solved")
 })
