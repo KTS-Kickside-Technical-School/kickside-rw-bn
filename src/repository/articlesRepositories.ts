@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Article from "../database/models/article"
 import ArticleComment from "../database/models/articleComment";
 import ArticlesEditRequest from "../database/models/articlesEditRequest";
@@ -39,8 +40,8 @@ const editArticle = async (_id: String, data: any) => {
     return Article.findByIdAndUpdate({ _id }, data, { new: true })
 }
 
-const getArticleComments = async (article: any) => {
-    return ArticleComment.find({ article }).sort({ createdAt: -1 })
+const findArticleComments = async (article: any) => {
+    return ArticleComment.find({ article })
 }
 
 const findArticlesEditRequests = async () => {
@@ -63,10 +64,169 @@ const saveArticleViewsRecord = async (data: any) => {
     return await ArticleView.create(data)
 };
 
-const findArticlesByCategory = async(category: string) =>{
+const findArticlesByCategory = async (category: string) => {
     return Article.find({ category: category.toLocaleLowerCase() })
-    .select("_id title author views category")
-    .populate("author", "firstName lastName email")
+        .populate("author", "firstName lastName email")
+}
+
+const findArticlesByYearAndAttribute = async (key: any, value: String, year: any) => {
+    const startOfYear = new Date(`${year}-01-01`);
+    const endOfYear = new Date(`${year}-12-31T23:59:59.999Z`);
+
+    const articles = await Article.find({
+        [key]: value,
+        createdAt: { $gte: startOfYear, $lte: endOfYear }
+    })
+        .populate("author")
+        .sort({ createdAt: -1 });
+
+    return articles;
+}
+
+const findMonthlyAnalyticsByYear = async (year: any, userId: any) => {
+    try {
+        const startOfYear = new Date(`${year}-01-01`);
+        const endOfYear = new Date(`${year}-12-31T23:59:59.999Z`);
+
+        const monthlyViews = await ArticleView.aggregate([
+            {
+                $match: {
+                    createdAt: { $gte: startOfYear, $lte: endOfYear }
+                }
+            },
+            {
+                $lookup: {
+                    from: "articles",
+                    localField: "article",
+                    foreignField: "_id",
+                    as: "articleDetails"
+                }
+            },
+            {
+                $unwind: "$articleDetails"
+            },
+            {
+                $match: {
+                    "articleDetails.author": new mongoose.Types.ObjectId(userId)
+                }
+            },
+            {
+                $group: {
+                    _id: { $month: "$createdAt" },
+                    views: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { "_id": 1 }
+            }
+        ]);
+
+        const monthlyComments = await ArticleComment.aggregate([
+            {
+                $match: {
+                    createdAt: { $gte: startOfYear, $lte: endOfYear }
+                }
+            },
+            {
+                $lookup: {
+                    from: "articles",
+                    localField: "article",
+                    foreignField: "_id",
+                    as: "articleDetails"
+                }
+            },
+            {
+                $unwind: "$articleDetails"
+            },
+            {
+                $match: {
+                    "articleDetails.author": new mongoose.Types.ObjectId(userId)
+                }
+            },
+            {
+                $group: {
+                    _id: { $month: "$createdAt" },
+                    comments: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { "_id": 1 }
+            }
+        ]);
+
+        const monthShortNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+        const currentMonth = new Date().getMonth() + 1;
+
+        const formattedData = Array.from({ length: 12 }, (_, index) => {
+            const monthIndex = index + 1;
+
+            if (year < new Date().getFullYear()) {
+                const viewData = monthlyViews.find(data => data._id === monthIndex);
+                const commentData = monthlyComments.find(data => data._id === monthIndex);
+
+                return {
+                    month: monthShortNames[index],
+                    views: viewData ? viewData.views : 0,
+                    comments: commentData ? commentData.comments : 0
+                };
+            }
+
+            if (monthIndex > currentMonth) {
+                return null;
+            }
+
+            const viewData = monthlyViews.find(data => data._id === monthIndex);
+            const commentData = monthlyComments.find(data => data._id === monthIndex);
+
+            return {
+                month: monthShortNames[index],
+                views: viewData ? viewData.views : 0,
+                comments: commentData ? commentData.comments : 0
+            };
+        }).filter(item => item !== null);
+
+        return formattedData;
+    } catch (error) {
+        console.error('Error fetching monthly analytics:', error);
+        throw error;
+    }
+};
+
+const findArticlesTotalComments = async (articles: any[]) => {
+    try {
+        const commentCounts = await Promise.all(
+            articles.map(async (article) => {
+                const comments = await findArticleComments(article._id);
+                return comments.length;
+            })
+        );
+
+        const totalComments = commentCounts.reduce((sum, count) => sum + count, 0);
+        return totalComments;
+    } catch (error) {
+        throw error;
+    }
+};
+
+const findArticlesTotalViews = async (articles: any[]) => {
+    try {
+        const viewsCounts = await Promise.all(
+            articles.map(async (article) => {
+                const views = await findArticleViewsByArticleId(article._id);
+                return views.length;
+            })
+        );
+
+        const totalViews = viewsCounts.reduce((sum, count) => sum + count, 0);
+        return totalViews;
+    } catch (error) {
+        throw error;
+    }
+}
+
+const findArticleViewsByArticleId = async (articleId: number) => {
+    return await ArticleView.find({ article: articleId })
 }
 
 export default {
@@ -78,11 +238,15 @@ export default {
     saveArticleEditRequest,
     findArticleEditRequestByAttribute,
     editArticle,
-    getArticleComments,
+    findArticleComments,
     findArticlesEditRequests,
     editArticleEditRequest,
     saveArticleComment,
     deleteArticle,
     saveArticleViewsRecord,
     findArticlesByCategory,
+    findArticlesByYearAndAttribute,
+    findMonthlyAnalyticsByYear,
+    findArticlesTotalComments,
+    findArticlesTotalViews
 }
