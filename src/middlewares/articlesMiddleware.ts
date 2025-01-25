@@ -173,7 +173,7 @@ export const isArticleEditRequestExistsAndPending = async (req: any, res: Respon
 }
 
 export const isArticleHaveComments = async (article: any) => {
-    const comments = await articlesRepositories.getArticleComments(article);
+    const comments = await articlesRepositories.findArticleComments(article);
     return comments
 }
 
