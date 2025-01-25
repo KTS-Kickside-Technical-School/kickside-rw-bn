@@ -34,10 +34,10 @@ const userLogin = async (req: any, res: Response): Promise<any> => {
         const device = req.headers["user-agent"] || "Unknown Devices";
         const ip = req.ip || req.connection.remoteAddress;
 
-        // await sendEmail(req.user.email, 'New Login Detected - Kickside Rw',
-        //     'New Account Login',
-        //     `<p>New login was detected to you account on <b>${device}</b> with this IP address: <b>${ip}</b>, if this was not you try reseting password.</p>`
-        // );
+        await sendEmail(req.user.email, 'New Login Detected - Kickside Rw',
+            'New Account Login',
+            `<p>New login was detected to you account on <b>${device}</b> with this IP address: <b>${ip}</b>, if this was not you try reseting password.</p>`
+        );
 
 
         return res.status(200).json({

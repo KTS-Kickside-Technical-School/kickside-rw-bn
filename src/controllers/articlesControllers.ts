@@ -38,7 +38,7 @@ const getSingleArticle = async (req: any, res: Response): Promise<any> => {
         await articlesRepositories.saveArticleViewsRecord({ article: article._id });
 
         const newViews = article.views + 1
-
+        console.log(newViews)
         await articlesRepositories.editArticle(article._id, { views: newViews });
 
         article = await articlesRepositories.findArticleByAttribute("_id", article._id)
@@ -253,33 +253,6 @@ const getArticlesByCategory = async (req: any, res: Response): Promise<any> => {
     }
 }
 
-const journalistAnalytics = async (req: any, res: Response): Promise<any> => {
-    try {
-        const { year } = req.params;
-
-        const articles = await articlesRepositories.findArticlesByYearAndAttribute("author", req.user._id, year);
-        const comments = await articlesRepositories.findArticlesTotalComments(articles);
-        const views = await articlesRepositories.findArticlesTotalViews(articles);
-        const monthlyAnalytics = await articlesRepositories.findMonthlyAnalyticsByYear(year, req.user._id);
-
-        return res.status(200).json({
-            status: 200,
-            message: "Analytics retrieved successfully",
-            data: {
-                totalArticles: articles.length,
-                totalComments: comments,
-                totalViews: views,
-                monthlyAnalytics
-            }
-        })
-    } catch (error) {
-        res.status(500).json({
-            status: 500,
-            message: error.message
-        })
-    }
-}
-
 export default {
     getPublishedArticles,
     getAllArticles,
@@ -293,6 +266,6 @@ export default {
     approveArticlesEditRequests,
     postArticleComment,
     deleteArticle,
-    getArticlesByCategory,
-    journalistAnalytics
+
+    getArticlesByCategory
 }
