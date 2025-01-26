@@ -111,10 +111,11 @@ export const enableUser = async (req: any, res: Response, next: NextFunction): P
 
         const enabledUser = await workersRepositories.updateUser(req.user._id, req.body);
 
-        await sendEmail(req.user.email, "Account disabled.", 'Your account is disabled',
+        await sendEmail(req.user.email, "Account enabled.", 'Your account is enabled',
             `
              <p>We are delighted to inform you that your Kickside account has been re-enabled. It’s great to have you back with us!</p>
-            <p>We appreciate your dedication and contribution as a valued team member in your role as <b>${req.user.role}</b>. We are excited to see your continued impact on our platform and community.</p>
+            <p>We appreciate your dedication and contribution as a valued team member in your role as <b>${req.user.role}</b>. 
+            <br> We are excited to see your continued impact on our platform and community.</p>
             <p>If you have any questions or encounter any issues, feel free to contact our support team. We’re here to assist you!</p>
             <p>Once again, welcome back, and we look forward to working with you!</p>
             <p>Best regards,</p>
