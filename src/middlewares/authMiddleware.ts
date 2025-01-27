@@ -42,7 +42,7 @@ export const isUserExistsById = async (req: any, res: Response, next: NextFuncti
     }
 };
 
-export const isUserExistByNames = async(req:any, res: Response, next: NextFunction):Promise<any> =>{
+export const isUserExistByUsername = async(req:any, res: Response, next: NextFunction):Promise<any> =>{
     try {
 
     const { username } = req.params;
