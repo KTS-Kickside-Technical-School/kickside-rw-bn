@@ -181,12 +181,41 @@ export const updateUserProfile = async (req: any, res: Response): Promise<any> =
 
     }
 }
+const getAuthorDetails = async (req: any, res:Response):Promise<any> => {
+    const { username } = req.params;
+    const user = await authRepositories.findUserByUsernames(username);
+    const articles = await authRepositories.findArticlesByAuthor(user._id);
+    const relatedJournalists = await authRepositories.findRelatedJournalists(user._id);
 
+    return res.status(200).json({
+        status: 200,
+        message: "Author Details Fetched Successfully",
+        author: {
+            profile: {
+                username: user.username,
+                firstname: user.firstName,
+                lastname: user.lastName,
+                bio: user.bio,
+                profileImage: user.profile,
+            },
+            articles,
+        },
+        relatedJournalists: relatedJournalists.map((user) => ({
+            username: user.username,
+            irstname: user.firstName,
+            lastname: user.lastName,
+            bio: user.bio,
+            profileImage: user.profile,
+        })),
+    });
+};
 export default {
     userLogin,
     forgotPassword,
     resetPassword,
     userLogout,
     getUserProfile,
-    updateUserProfile
+    updateUserProfile,
+
+    getAuthorDetails
 }

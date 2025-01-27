@@ -238,10 +238,11 @@ const deleteArticle = async (req: any, res: Response, next: NextFunction): Promi
 const getArticlesByCategory = async (req: any, res: Response): Promise<any> => {
     try {
         const { category } = req.params
+        const articles = await articlesRepositories.findArticlesByCategory(category)
         return res.status(200).json({
             status: 200,
             messsage: `Articles in the "${category}" category `,
-            data: { articles: req.articles }
+            data: { articles }
         })
 
     } catch (error) {
