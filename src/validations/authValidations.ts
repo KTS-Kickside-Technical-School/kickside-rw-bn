@@ -21,6 +21,7 @@ export const logoutSchema = Joi.object({
 export const updateProfileSchema = Joi.object({
     firstName: Joi.string().optional(),
     lastName: Joi.string().optional(),
+    username: Joi.string().required(),
     email: Joi.string().optional(),
     password: Joi.string().optional(),
     bio: Joi.string().optional(),

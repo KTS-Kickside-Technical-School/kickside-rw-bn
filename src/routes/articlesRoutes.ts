@@ -13,6 +13,7 @@ import {
 import bodyValidation from '../middlewares/bodyValidation';
 import { editArticleSchema, newArticleSchema, postArticleComment } from '../validations/articlesValidations';
 import { userAuthorization } from '../middlewares/authorization';
+import { isUserExistByUsername } from '../middlewares/authMiddleware';
 
 const articlesRoute = express.Router();
 
@@ -33,9 +34,9 @@ articlesRoute.get("/get-single-article/:slug", isArticleExistsBySlug, articlesCo
 articlesRoute.post("/post-comments", bodyValidation(postArticleComment), isArticleExists, articlesControllers.postArticleComment);
 
 articlesRoute.delete("/delete-article/:id", userAuthorization(["Admin"]), isArticleExists, articlesControllers.deleteArticle);
-
 articlesRoute.get("/get-articles-by-category/:category", isAreticlesExistsByCategory, articlesControllers.getArticlesByCategory)
-
 articlesRoute.get("/get-journalists-analytics/:year", userAuthorization(["Journalist", "Admin", "Editor"]), articlesControllers.journalistAnalytics)
+
+articlesRoute.get("/get-author-profile/:username", isUserExistByUsername, articlesControllers.getAuthorProfile);
 
 export default articlesRoute;

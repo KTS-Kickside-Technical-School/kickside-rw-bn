@@ -65,9 +65,11 @@ const saveArticleViewsRecord = async (data: any) => {
 };
 
 const findArticlesByCategory = async (category: string) => {
-    return Article.find({ category: category.toLocaleLowerCase() })
-        .populate("author", "firstName lastName email")
-}
+    return Article.find({
+        category: category.toLocaleLowerCase(),
+        status: "published",
+    }).populate("author", "firstName lastName email");
+};
 
 const findArticlesByYearAndAttribute = async (key: any, value: String, year: any) => {
     const startOfYear = new Date(`${year}-01-01`);

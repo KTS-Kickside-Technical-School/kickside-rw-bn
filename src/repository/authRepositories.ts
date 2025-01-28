@@ -1,3 +1,4 @@
+import Article from "../database/models/article"
 import Session from "../database/models/session"
 import User from "../database/models/user"
 
@@ -25,6 +26,24 @@ const getUserById = async(id: any) =>{
     return await User.findById(id)
 };
 
+export const findUserByUsernames = async (username) => {
+    return await User.findOne(
+        { username, 
+        isDisabled: false
+         });
+};
+
+export const findArticlesByAuthor = async (authorId) => {
+    return await Article.find({ author: authorId, status: "published" } )
+        .sort({ createdAt: -1 });
+};
+
+export const findRelatedJournalists = async (currentUserId) => {
+    return await User.find({ _id: { $ne: currentUserId }, isDisabled: false })
+        .select("firstName lastName bio username profile")
+        .limit(5)
+};
+
 
 export default {
     findUserByAttribute,
@@ -32,5 +51,9 @@ export default {
     findSessionByUserIdAndToken,
     updateUser,
     deleteSession,
-    getUserById
+    getUserById,
+
+    findUserByUsernames,
+    findArticlesByAuthor,
+    findRelatedJournalists
 }

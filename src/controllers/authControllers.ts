@@ -188,5 +188,5 @@ export default {
     resetPassword,
     userLogout,
     getUserProfile,
-    updateUserProfile
+    updateUserProfile,
 }

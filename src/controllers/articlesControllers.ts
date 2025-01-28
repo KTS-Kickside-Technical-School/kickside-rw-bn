@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import slugify from 'slugify';
 import articlesRepositories from "../repository/articlesRepositories"
+import authRepositories from "../repository/authRepositories";
 
 const getPublishedArticles = async (req: Request, res: Response): Promise<any> => {
     try {
@@ -238,10 +239,11 @@ const deleteArticle = async (req: any, res: Response, next: NextFunction): Promi
 const getArticlesByCategory = async (req: any, res: Response): Promise<any> => {
     try {
         const { category } = req.params
+        const articles = await articlesRepositories.findArticlesByCategory(category)
         return res.status(200).json({
             status: 200,
             messsage: `Articles in the "${category}" category `,
-            data: { articles: req.articles }
+            data: { articles }
         })
 
     } catch (error) {
@@ -280,6 +282,26 @@ const journalistAnalytics = async (req: any, res: Response): Promise<any> => {
     }
 }
 
+const getAuthorProfile = async (req: any, res: Response): Promise<any> => {
+    const { username } = req.params;
+    const user = await authRepositories.findUserByUsernames(username);
+    const plainUser = user.toJSON()
+    delete plainUser.password;
+    const articles = await authRepositories.findArticlesByAuthor(user._id);
+    const relatedJournalists = await authRepositories.findRelatedJournalists(user._id);
+
+    return res.status(200).json({
+        status: 200,
+        message: "Author Details Fetched Successfully",
+        data: {
+            author: plainUser,
+            articles,
+            relatedJournalists,
+        },
+
+    });
+};
+
 export default {
     getPublishedArticles,
     getAllArticles,
@@ -294,5 +316,6 @@ export default {
     postArticleComment,
     deleteArticle,
     getArticlesByCategory,
-    journalistAnalytics
+    journalistAnalytics,
+    getAuthorProfile
 }
