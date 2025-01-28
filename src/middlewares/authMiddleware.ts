@@ -70,3 +70,24 @@ export const isUserExistByUsername = async(req:any, res: Response, next: NextFun
         
     }
 }
+
+export const isUsernameAlreadyExist = async(req: any, res: Response, next: NextFunction): Promise<any> =>{
+    try {
+
+        const {username} = req.body
+        const user = await authRepositories.findUserByUsernames(username);
+        if (user) {
+            return res.status(400).json({
+                status: 400,
+                message: `Username ${username} is already token.`
+            })
+        }
+        next();
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            message: error.message
+        })
+        
+    }
+}
