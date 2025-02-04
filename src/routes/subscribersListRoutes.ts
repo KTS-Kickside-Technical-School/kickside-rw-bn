@@ -8,7 +8,7 @@ import { isSubscriber, isSubscriberExist } from '../middlewares/subscribersListM
 
 const subscribersRoute = express.Router()
 
-subscribersRoute.post("/subscribers-mail", bodyValidation(subscribersSchema), isSubscriberExist,subscribersListController.saveSubscibersController)
-subscribersRoute.get("/subscribers-mail/unsubscribe", bodyValidation(unsubscriberSchema), isSubscriber, subscribersListController.unsubscribeController )
+subscribersRoute.post("/user-subcription", bodyValidation(subscribersSchema), isSubscriberExist,subscribersListController.subscribeUserController)
+subscribersRoute.get("/user-unsubcription", bodyValidation(unsubscriberSchema), isSubscriber, subscribersListController.unsubscribeUserController )
 
 export default subscribersRoute

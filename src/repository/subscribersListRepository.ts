@@ -1,14 +1,14 @@
-import subcibersMailing from "../database/models/subscribersList";
+import SubscriberList from "../database/models/subscribersList";
 
 export const saveSubscibers = async(data: any)=>{
-    return await subcibersMailing.create(data)
+    return await SubscriberList.create(data)
 }
 export const findSubscriberByEmail = async(email)=>{
-    return await subcibersMailing.findOne({email})
+    return await SubscriberList.findOne({email})
 };
 
 export const unsubscriber = async(email) =>{
-    return await subcibersMailing.findOneAndDelete({email})
+    return await SubscriberList.findOneAndDelete({email})
 }
 
 export default {
