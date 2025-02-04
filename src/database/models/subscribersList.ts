@@ -1,12 +1,12 @@
 import mongoose, { Schema } from "mongoose";
 
-const subscribersListSchema = new Schema ({
+const subscribersUserListSchema = new Schema ({
     email: {
         type: String,
         required: true
     }
 },{timestamps: true})
 
-const subcibersMailing = mongoose.model('subcibersMailing', subscribersListSchema)
+const SubscriberList = mongoose.model('SubscriberList', subscribersUserListSchema)
 
-export default subcibersMailing
+export default SubscriberList
