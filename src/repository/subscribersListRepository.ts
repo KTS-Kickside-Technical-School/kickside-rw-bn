@@ -1,18 +1,23 @@
 import SubscriberList from "../database/models/subscribersList";
 
-export const saveSubscibers = async(data: any)=>{
+const saveSubscibers = async (data: any) => {
     return await SubscriberList.create(data)
 }
-export const findSubscriberByEmail = async(email)=>{
-    return await SubscriberList.findOne({email})
+const findSubscriberByEmail = async (email) => {
+    return await SubscriberList.findOne({ email })
 };
 
-export const unsubscriber = async(email) =>{
-    return await SubscriberList.findOneAndDelete({email})
+const unsubscriber = async (email) => {
+    return await SubscriberList.findOneAndDelete({ email })
+}
+
+const getSubscribersList = async () => {
+    return await SubscriberList.find({}).sort({ createdAt: -1 })
 }
 
 export default {
     saveSubscibers,
     findSubscriberByEmail,
-    unsubscriber
+    unsubscriber,
+    getSubscribersList
 }
