@@ -4,19 +4,19 @@ import subscribersListRepository from "../repository/subscribersListRepository";
 import jwt from 'jsonwebtoken'
 
 
-const subscribeUserController = async(req: any, res: Response, next: NextFunction): Promise<any> =>{
+const subscribeUserController = async (req: any, res: Response, next: NextFunction): Promise<any> => {
     try {
-        const {email} = req.body
-        const subscriber = await subscribersListRepository.saveSubscibers({email});
+        const { email } = req.body
+        const subscriber = await subscribersListRepository.saveSubscibers({ email });
 
-        const token = jwt.sign({ 
+        const token = jwt.sign({
             email: subscriber.email
-        }, process.env.JWT_SECRET, { expiresIn: "1d"});
+        }, process.env.JWT_SECRET, { expiresIn: "1d" });
 
         const unsubscribeLink = `${process.env.CLIENT_URL}email=${subscriber.email}/unsubscriber?token=${token}`;
 
-        await sendEmail( email, 
-            "User Subscription", 
+        await sendEmail(email,
+            "User Subscription",
             "Subscription Confirmed",
             `<p>Dear <b>${subscriber.email}</b>,</p>
             <p>Thank you for subscribing to Kickside Rwanda! You are now part of our community and will receive updates, news, and exclusive offers from us.</p>
@@ -35,17 +35,17 @@ const subscribeUserController = async(req: any, res: Response, next: NextFunctio
             status: 500,
             message: error.message
         })
-        
+
     }
 };
-const unsubscribeUserController = async(req: any, res: Response): Promise<any> =>{
+const unsubscribeUserController = async (req: any, res: Response): Promise<any> => {
     try {
-        const {token} =req.body
+        const { token } = req.body
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        const {email} = decoded
-        let unsubscriber =  await subscribersListRepository.unsubscriber(email);        
-        await sendEmail( email, 
-            "User unsubscription", 
+        const { email } = decoded
+        let unsubscriber = await subscribersListRepository.unsubscriber(email);
+        await sendEmail(email,
+            "User unsubscription",
             "Unsubscription Confirmed",
             `<p>Dear <b>${unsubscriber.email}</b>,</p>
             <p>You have successfully unsubscribed from our system. You will no longer receive updates from us.</p>
@@ -54,7 +54,7 @@ const unsubscribeUserController = async(req: any, res: Response): Promise<any> =
             <br>
             <p>Best regards,</p>
             <p><b>Kickside Rwanda Team</b></p>`
-      
+
         )
         res.status(200).json({
             status: 200,
@@ -65,11 +65,27 @@ const unsubscribeUserController = async(req: any, res: Response): Promise<any> =
             status: 500,
             message: error.message
         })
-        
+
+    }
+}
+
+const getSubscriptionListController = async (req: any, res: Response): Promise<any> => {
+    try {
+        const subscribers = await subscribersListRepository.getSubscribersList();
+        return res.status(200).json({
+            status: 200,
+            data: { subscribers }
+        })
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            message: error.message
+        })
     }
 }
 
 export default {
     subscribeUserController,
-    unsubscribeUserController
+    unsubscribeUserController,
+    getSubscriptionListController
 }
