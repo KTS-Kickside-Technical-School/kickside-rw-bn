@@ -283,24 +283,47 @@ const journalistAnalytics = async (req: any, res: Response): Promise<any> => {
 }
 
 const getAuthorProfile = async (req: any, res: Response): Promise<any> => {
-    const { username } = req.params;
-    const user = await authRepositories.findUserByUsernames(username);
-    const plainUser = user.toJSON()
-    delete plainUser.password;
-    const articles = await authRepositories.findArticlesByAuthor(user._id);
-    const relatedJournalists = await authRepositories.findRelatedJournalists(user._id);
+    try {
+        const { username } = req.params;
+        const user = await authRepositories.findUserByUsernames(username);
+        const plainUser = user.toJSON()
+        delete plainUser.password;
+        const articles = await authRepositories.findArticlesByAuthor(user._id);
+        const relatedJournalists = await authRepositories.findRelatedJournalists(user._id);
 
-    return res.status(200).json({
-        status: 200,
-        message: "Author Details Fetched Successfully",
-        data: {
-            author: plainUser,
-            articles,
-            relatedJournalists,
-        },
+        return res.status(200).json({
+            status: 200,
+            message: "Author Details Fetched Successfully",
+            data: {
+                author: plainUser,
+                articles,
+                relatedJournalists,
+            },
+        });
 
-    });
+    } catch (error: any) {
+        return res.status(500).json({
+            status: 500,
+            message: error.message
+        })
+    }
 };
+
+const getPopularArticles = async (req: any, res: Response): Promise<any> => {
+    try {
+        const articles = await articlesRepositories.findPopularArticles();
+        return res.status(200).json({
+            status: 200,
+            message: "Popular Articles Fetched Successfully",
+            data: { articles }
+        })
+    } catch (error: any) {
+        return res.status(500).json({
+            status: 500,
+            message: error.message
+        })
+    }
+}
 
 export default {
     getPublishedArticles,
@@ -317,5 +340,6 @@ export default {
     deleteArticle,
     getArticlesByCategory,
     journalistAnalytics,
-    getAuthorProfile
+    getAuthorProfile,
+    getPopularArticles
 }
