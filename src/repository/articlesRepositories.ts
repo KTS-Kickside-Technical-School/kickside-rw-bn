@@ -230,6 +230,69 @@ const findArticlesTotalViews = async (articles: any[]) => {
 const findArticleViewsByArticleId = async (articleId: number) => {
     return await ArticleView.find({ article: articleId })
 }
+const findPopularArticles = async () => {
+    const today = new Date();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay());
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const articles = await ArticleView.aggregate([
+        {
+            $match: {
+                createdAt: { $gte: startOfWeek }
+            }
+        },
+        {
+            $group: {
+                _id: '$article',
+                viewsCount: { $sum: 1 }
+            }
+        },
+        { $sort: { viewsCount: -1 } },
+        { $limit: 10 },
+        {
+            $lookup: {
+                from: 'articles',
+                localField: '_id',
+                foreignField: '_id',
+                as: 'article'
+            }
+        },
+        { $unwind: '$article' },
+        {
+            $match: {
+                'article.status': 'published',
+                'article.isDeleted': false
+            }
+        },
+        {
+            $lookup: {
+                from: 'users',
+                localField: 'article.author',
+                foreignField: '_id',
+                as: 'author'
+            }
+        },
+        { $unwind: '$author' },
+        {
+            $project: {
+                _id: 0,
+                article: 1,
+                viewsCount: 1,
+                author: {
+                    _id: 1,
+                    firstName: 1,
+                    lastName: 1,
+                    username: 1,
+                    profile: 1
+                }
+            }
+        }
+    ]);
+
+    return articles;
+
+};
 
 export default {
     findAllArticles,
@@ -250,5 +313,6 @@ export default {
     findArticlesByYearAndAttribute,
     findMonthlyAnalyticsByYear,
     findArticlesTotalComments,
-    findArticlesTotalViews
+    findArticlesTotalViews,
+    findPopularArticles
 }

@@ -39,4 +39,6 @@ articlesRoute.get("/get-journalists-analytics/:year", userAuthorization(["Journa
 
 articlesRoute.get("/get-author-profile/:username", isUserExistByUsername, articlesControllers.getAuthorProfile);
 
+articlesRoute.get("/get-popular-articles", articlesControllers.getPopularArticles);
+
 export default articlesRoute;
