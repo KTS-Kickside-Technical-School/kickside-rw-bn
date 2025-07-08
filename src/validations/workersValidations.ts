@@ -3,7 +3,6 @@ import Joi from "joi";
 export const createUserSchema = Joi.object({
     firstName: Joi.string().required(),
     lastName: Joi.string(),
-    username: Joi.string().required(),
     email: Joi.string().required(),
     role: Joi.string().valid('Journalist', 'Editor', 'Admin'),
 })
