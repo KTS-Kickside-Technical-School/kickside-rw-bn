@@ -10,7 +10,8 @@ const userSchema = new Schema({
     },
     username: {
         type: String,
-        required: false
+        required: false,
+        default: new Date().getTime().toString(36)
     },
     email: {
         type: String,
