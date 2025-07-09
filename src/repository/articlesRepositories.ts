@@ -289,10 +289,63 @@ const findPopularArticles = async () => {
             }
         }
     ]);
+    return articles;
+};
+
+const searchArticles = async (query) => {
+    if (!query || typeof query !== "string") return [];
+
+    const keywords = query
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .map(word => new RegExp(word, 'i'));
+    const articles = await Article.aggregate([
+        {
+            $match: {
+                isDeleted: false,
+                $or: [
+                    ...keywords.map(kw => ({ title: { $regex: kw } })),
+                    ...keywords.map(kw => ({ content: { $regex: kw } })),
+                    ...keywords.map(kw => ({ category: { $regex: kw } })),
+                    ...keywords.map(kw => ({ slug: { $regex: kw } })),
+                ]
+            }
+        },
+        {
+            $addFields: {
+                score: {
+                    $add: [
+                        {
+                            $size: {
+                                $filter: {
+                                    input: keywords,
+                                    as: "kw",
+                                    cond: { $regexMatch: { input: "$title", regex: "$$kw" } }
+                                }
+                            }
+                        },
+                        {
+                            $size: {
+                                $filter: {
+                                    input: keywords,
+                                    as: "kw",
+                                    cond: { $regexMatch: { input: "$content", regex: "$$kw" } }
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            $sort: { score: -1, createdAt: -1 }
+        }
+    ]);
 
     return articles;
-
 };
+
 
 export default {
     findAllArticles,
@@ -314,5 +367,6 @@ export default {
     findMonthlyAnalyticsByYear,
     findArticlesTotalComments,
     findArticlesTotalViews,
-    findPopularArticles
+    findPopularArticles,
+    searchArticles
 }

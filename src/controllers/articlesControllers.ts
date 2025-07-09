@@ -325,6 +325,24 @@ const getPopularArticles = async (req: any, res: Response): Promise<any> => {
     }
 }
 
+const searchArticles = async (req: any, res: Response): Promise<any> => {
+    try {
+        const { query } = req.params;
+        console.log(query)
+        const articles = await articlesRepositories.searchArticles(query);
+        return res.status(200).json({
+            status: 200,
+            message: "Search Results Fetched Successfully",
+            data: { articles }
+        })
+    } catch (error: any) {
+        return res.status(500).json({
+            status: 500,
+            message: error.message
+        })
+    }
+}
+
 export default {
     getPublishedArticles,
     getAllArticles,
@@ -341,5 +359,6 @@ export default {
     getArticlesByCategory,
     journalistAnalytics,
     getAuthorProfile,
-    getPopularArticles
+    getPopularArticles,
+    searchArticles
 }

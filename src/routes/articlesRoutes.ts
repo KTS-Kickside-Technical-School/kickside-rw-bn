@@ -21,7 +21,7 @@ articlesRoute.post("/create-article", userAuthorization(["Editor", "Journalist",
 articlesRoute.get("/get-own-articles", userAuthorization(["Editor", "Journalist", "Admin"]), articlesControllers.getOwnArticles);
 articlesRoute.get("/get-own-single-article/:id", userAuthorization(["Editor", "Journalist", "Admin"]), isArticleExists, articlesControllers.getSingleArticle);
 articlesRoute.post("/request-edit-access/:id", userAuthorization(["Journalist"]), isArticleExists, isArticleEditRequestAlreadyExists, articlesControllers.requestArticleEditAccess);
-articlesRoute.put("/journalist-edit-article/:id", userAuthorization(["Journalist", "Edit", "Admin"]), bodyValidation(editArticleSchema), isArticleExists, isArticleOwned, isArticleEditable, articlesControllers.editArticle);
+articlesRoute.put("/journalist-edit-article/:id", userAuthorization(["Journalist", "Editor", "Admin"]), bodyValidation(editArticleSchema), isArticleExists, isArticleOwned, isArticleEditable, articlesControllers.editArticle);
 
 articlesRoute.get("/get-all-articles", userAuthorization(["Editor", "Admin"]), articlesControllers.getAllArticles);
 articlesRoute.put("/toggle-article-publish/:id", userAuthorization(["Editor", "Admin"]), isArticleExists, articlesControllers.toggleArticlePublish);
@@ -40,5 +40,7 @@ articlesRoute.get("/get-journalists-analytics/:year", userAuthorization(["Journa
 articlesRoute.get("/get-author-profile/:username", isUserExistByUsername, articlesControllers.getAuthorProfile);
 
 articlesRoute.get("/get-popular-articles", articlesControllers.getPopularArticles);
+
+articlesRoute.get("/search-articles/:query", articlesControllers.searchArticles);
 
 export default articlesRoute;
