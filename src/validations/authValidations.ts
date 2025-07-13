@@ -28,3 +28,9 @@ export const updateProfileSchema = Joi.object({
     profile: Joi.string().optional(),
     phone: Joi.string().optional()
 });
+
+
+export const changePasswordSchema = Joi.object({
+    password: Joi.string().required(),
+    newPassword: Joi.string().required()
+})

@@ -14,31 +14,32 @@ const findSessionByUserIdAndToken = async (user: any, content: any) => {
     return await Session.findOne({ user, content })
 }
 
-export const updateUser = async (userId: any, updateData: any) => {
+const updateUser = async (userId: any, updateData: any) => {
     return await User.findByIdAndUpdate(userId, updateData, { new: true })
 }
 
-export const deleteSession = async (sessionId: any) => {
+const deleteSession = async (sessionId: any) => {
     return await Session.findByIdAndDelete(sessionId)
 };
 
-const getUserById = async(id: any) =>{
+const getUserById = async (id: any) => {
     return await User.findById(id)
 };
 
-export const findUserByUsernames = async (username) => {
+const findUserByUsernames = async (username) => {
     return await User.findOne(
-        { username, 
-        isDisabled: false
-         });
+        {
+            username,
+            isDisabled: false
+        });
 };
 
-export const findArticlesByAuthor = async (authorId) => {
-    return await Article.find({ author: authorId, status: "published" } )
+const findArticlesByAuthor = async (authorId) => {
+    return await Article.find({ author: authorId, status: "published" })
         .sort({ createdAt: -1 });
 };
 
-export const findRelatedJournalists = async (currentUserId) => {
+const findRelatedJournalists = async (currentUserId) => {
     return await User.find({ _id: { $ne: currentUserId }, isDisabled: false })
         .select("firstName lastName bio username profile")
         .limit(5)

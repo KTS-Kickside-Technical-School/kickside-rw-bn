@@ -44,13 +44,16 @@ const getSingleArticle = async (req: any, res: Response): Promise<any> => {
 
         article = await articlesRepositories.findArticleByAttribute("_id", article._id)
 
+        const related = await articlesRepositories.findArticleRelatedArticles(article._id, article.category)
+
         return res.status(200).json({
             status: 200,
             message: "Article retrieved successfully",
             data:
             {
                 article: article,
-                comments: req.comments
+                comments: req.comments,
+                related
             }
         })
     } catch (error) {

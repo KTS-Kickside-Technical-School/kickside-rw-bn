@@ -1,7 +1,7 @@
 import express from 'express';
 import { isUserExists } from '../middlewares/authMiddleware';
 import bodyValidation from '../middlewares/bodyValidation';
-import { forgotPasswordSchema, resetPasswordSchema, userLoginSchema, updateProfileSchema } from '../validations/authValidations';
+import { forgotPasswordSchema, resetPasswordSchema, userLoginSchema, updateProfileSchema, changePasswordSchema } from '../validations/authValidations';
 import authControllers from '../controllers/authControllers';
 import { userAuthorization } from '../middlewares/authorization';
 
@@ -17,5 +17,7 @@ authRoute.post("/logout", userAuthorization(["Admin", "Journalist", "Editor"]), 
 
 authRoute.get("/get-profile", userAuthorization(["Admin", "Journalist", "Editor"]), authControllers.getUserProfile);
 authRoute.put("/update-profile", userAuthorization(["Admin", "Editor", "Journalist"]), authControllers.updateUserProfile)
+
+authRoute.put("/change-password", userAuthorization(["Admin", "Editor", "Journalist"]), bodyValidation(changePasswordSchema), authControllers.changePassword);
 
 export default authRoute;   

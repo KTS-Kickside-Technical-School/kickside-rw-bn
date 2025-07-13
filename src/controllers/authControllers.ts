@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { comparePassword, decodeToken, destroyToken, generateToken } from "../helpers/authHelpers";
+import { comparePassword, decodeToken, destroyToken, generateToken, hashPassword } from "../helpers/authHelpers";
 import authRepositories from "../repository/authRepositories";
 import { sendEmail } from "../service/emailService";
 import user from "../database/models/user";
@@ -17,7 +17,7 @@ const userLogin = async (req: any, res: Response): Promise<any> => {
                 message: "Email or Password is not correct.",
             })
         }
-        
+
         if (req.user.isDisabled === true) {
             return res.status(401).json({
                 status: 401,
@@ -130,8 +130,9 @@ const resetPassword = async (req: any, res: Response): Promise<any> => {
 
 const userLogout = async (req: any, res: Response): Promise<any> => {
     try {
-        await destroyToken(req.session.content)
-        await authRepositories.deleteSession(req.session._id)
+        await destroyToken(req.session.content);
+
+        await authRepositories.deleteSession(req.session._id);
 
         return res.status(200).json({
             status: 200,
@@ -182,6 +183,36 @@ export const updateUserProfile = async (req: any, res: Response): Promise<any> =
     }
 }
 
+const changePassword = async (req: any, res: Response): Promise<any> => {
+    try {
+        const userId = req.user._id
+
+        const isPasswordMatch = await comparePassword(req.body.password, req.user.password);
+
+        if (!isPasswordMatch) {
+            return res.status(401).json({
+                status: 401,
+                message: "Currnet password is not correct.",
+            })
+        }
+        const newPassword = await hashPassword(req.body.newPassword);
+
+        const user = await authRepositories.updateUser(userId, { password: newPassword });
+
+        return res.status(200).json({
+            status: 200,
+            message: "Password changed successfully",
+            data: { user }
+        })
+    } catch (error) {
+        return res.status(500).json({
+            status: 500,
+            message: error.message
+
+        })
+    }
+}
+
 export default {
     userLogin,
     forgotPassword,
@@ -189,4 +220,5 @@ export default {
     userLogout,
     getUserProfile,
     updateUserProfile,
+    changePassword
 }

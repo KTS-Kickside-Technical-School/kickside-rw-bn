@@ -294,6 +294,18 @@ const findPopularArticles = async () => {
 
 };
 
+const findArticleRelatedArticles = async (article: any, category: any) => {
+    return await Article.find({
+        category: category,
+        _id: { $ne: article },
+        status: 'published',
+    })
+        .populate('author')
+        .sort({ createdAt: -1 })
+        .limit(3);
+};
+
+
 export default {
     findAllArticles,
     findPublishedArticles,
@@ -314,5 +326,6 @@ export default {
     findMonthlyAnalyticsByYear,
     findArticlesTotalComments,
     findArticlesTotalViews,
-    findPopularArticles
+    findPopularArticles,
+    findArticleRelatedArticles
 }
