@@ -3,6 +3,7 @@ import Article from "../database/models/article"
 import ArticleComment from "../database/models/articleComment";
 import ArticlesEditRequest from "../database/models/articlesEditRequest";
 import ArticleView from "../database/models/articlesViews";
+import moment from "moment";
 
 const findPublishedArticles = async () => {
     return Article.find({ status: 'published' })
@@ -156,6 +157,25 @@ const findMonthlyAnalyticsByYear = async (year: any, userId: any) => {
             }
         ]);
 
+        const monthlyArticles = await Article.aggregate([
+            {
+                $match: {
+                    createdAt: { $gte: startOfYear, $lte: endOfYear },
+                    author: new mongoose.Types.ObjectId(userId)
+                }
+            },
+            {
+                $group: {
+                    _id: { $month: "$createdAt" },
+                    articles: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { "_id": 1 }
+            }
+        ]);
+
+
         const monthShortNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
         const currentMonth = new Date().getMonth() + 1;
@@ -180,12 +200,15 @@ const findMonthlyAnalyticsByYear = async (year: any, userId: any) => {
 
             const viewData = monthlyViews.find(data => data._id === monthIndex);
             const commentData = monthlyComments.find(data => data._id === monthIndex);
+            const articleData = monthlyArticles.find(data => data._id === monthIndex);
 
             return {
                 month: monthShortNames[index],
                 views: viewData ? viewData.views : 0,
-                comments: commentData ? commentData.comments : 0
+                comments: commentData ? commentData.comments : 0,
+                articles: articleData ? articleData.articles : 0
             };
+
         }).filter(item => item !== null);
 
         return formattedData;
@@ -306,6 +329,78 @@ const findArticleRelatedArticles = async (article: any, category: any) => {
 };
 
 
+/**
+ * Get top read articles for a specific month
+ * @param {ObjectId} user - User ID to filter articles by author
+ * @param {Number} year - Year (e.g., 2025)
+ * @param {Number} month - Month (0-11, where 0 = Jan, 11 = Dec)
+ * @param {Number} limit - Max number of articles to return
+ * @returns {Promise<Array>} List of top articles
+ */
+
+const findTopReadArticlesByMonth = async (user, year, month, limit = 10) => {
+    const startOfMonth = moment.utc({ year, month: month - 1 }).startOf('month').toDate();
+    const endOfMonth = moment.utc({ year, month: month - 1 }).endOf('month').toDate();
+
+    const views = await ArticleView.aggregate([
+        {
+            $match: {
+                createdAt: { $gte: startOfMonth, $lte: endOfMonth }
+            }
+        },
+        {
+            $lookup: {
+                from: 'articles',
+                localField: 'article',
+                foreignField: '_id',
+                as: 'articleData'
+            }
+        },
+        { $unwind: '$articleData' },
+        {
+            $match: {
+                'articleData.author': new mongoose.Types.ObjectId(user)
+            }
+        },
+        {
+            $group: {
+                _id: '$article',
+                count: { $sum: 1 },
+                article: { $first: '$articleData' }
+            }
+        },
+        { $sort: { count: -1 } },
+        { $limit: limit },
+        {
+            $lookup: {
+                from: 'users',
+                localField: 'article.author',
+                foreignField: '_id',
+                as: 'authorData'
+            }
+        },
+        { $unwind: '$authorData' },
+        {
+            $project: {
+                article: 1,
+                count: 1,
+                author: {
+                    _id: '$authorData._id',
+                    firstName: '$authorData.firstName',
+                    lastName: '$authorData.lastName'
+                }
+            }
+        }
+    ]);
+
+    return views.map(v => ({
+        ...v.article,
+        views: v.count,
+        author: v.author
+    }));
+};
+
+
 export default {
     findAllArticles,
     findPublishedArticles,
@@ -327,5 +422,6 @@ export default {
     findArticlesTotalComments,
     findArticlesTotalViews,
     findPopularArticles,
-    findArticleRelatedArticles
+    findArticleRelatedArticles,
+    findTopReadArticlesByMonth
 }
