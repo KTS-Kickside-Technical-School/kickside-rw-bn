@@ -328,6 +328,30 @@ const getPopularArticles = async (req: any, res: Response): Promise<any> => {
     }
 }
 
+const journalistGetMonthlyTopArticles = async (req: any, res: Response): Promise<any> => {
+    try {
+        const year = parseInt(req.query.year) || new Date().getFullYear();
+        const month = parseInt(req.query.month) || new Date().getMonth();
+
+        console.log(month)
+        if (month < 1 || month > 12) {
+            return res.status(400).json({ status: 400, message: "Invalid month value" });
+        }
+
+        const monthsTopRead = await articlesRepositories.findTopReadArticlesByMonth(req.user._id, year, month);
+        return res.status(200).json({
+            status: 200,
+            message: "Monthly Top Articles Fetched Successfully",
+            data: { monthsTopRead }
+        })
+    } catch (error: any) {
+        return res.status(500).json({
+            status: 500,
+            message: error.message
+        })
+    }
+};
+
 export default {
     getPublishedArticles,
     getAllArticles,
@@ -344,5 +368,6 @@ export default {
     getArticlesByCategory,
     journalistAnalytics,
     getAuthorProfile,
-    getPopularArticles
+    getPopularArticles,
+    journalistGetMonthlyTopArticles
 }
