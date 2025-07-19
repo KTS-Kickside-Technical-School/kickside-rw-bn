@@ -27,7 +27,7 @@ export const isSubscriberExist = async (req, res, next) =>{
         if(checkSubscriber){
             return res.status(400).json({
                 status: 400,
-                message: "You have arleady subscribed to our newsletter."
+                message: "You have arleady subscribed to our newsletter, Thank you!"
             })
         }
         next()
