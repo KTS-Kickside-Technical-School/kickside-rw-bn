@@ -78,33 +78,46 @@ export const getAllWorkers = async (req: any, res: Response, next: NextFunction)
     }
 };
 
-export const disableUser = async (req: any, res: Response, next: NextFunction): Promise<any> => {
+const disableUser = async (req: any, res: Response, next: NextFunction): Promise<any> => {
     try {
         req.body.isDisabled = true;
+
         if (req.user.isDisabled === true) {
             return res.status(400).json({
                 status: 400,
                 message: "User is already disabled."
-            })
+            });
         }
 
         const disabledUser = await workersRepositories.updateUser(req.user._id, req.body);
-        await sendEmail(req.user.email, "Account disabled.", 'Your account is disabled',
-            `
-            <p><b>Your Kickside Account Has Been Disabled</b></p>
-            <p>We regret to inform you that your Kickside account has been disabled for the following reason:</p>
-            <p class="reason">${req.body.disableReason}</p>
-            <p>We are honored to have you as part of our team, serving as a <b>${req.user.role}</b>. We truly appreciate the efforts you have contributed to our platform.</p>
-            <p>If you believe this action was taken in error or you need further clarification, please contact our support team for assistance.</p>
-            <p>We value your association with Kickside and hope to resolve any concerns promptly.</p>
-            <p>Best regards,</p>
-            <p><b>Kickside Rwanda Team</b></p>
-            `);
+
+        try {
+            await sendEmail(
+                req.user.email,
+                "Account disabled.",
+                'Your account is disabled',
+                `
+          <p><b>Your Kickside Account Has Been Disabled</b></p>
+          <p>We regret to inform you that your Kickside account has been disabled for the following reason:</p>
+          <p class="reason">${req.body.disableReason}</p>
+          <p>We are honored to have you as part of our team, serving as a <b>${req.user.role}</b>. We truly appreciate the efforts you have contributed to our platform.</p>
+          <p>If you believe this action was taken in error or you need further clarification, please contact our support team for assistance.</p>
+          <p>We value your association with Kickside and hope to resolve any concerns promptly.</p>
+          <p>Best regards,</p>
+          <p><b>Kickside Rwanda Team</b></p>
+        `
+            );
+        } catch (emailErr) {
+            console.error("Email sending failed:", emailErr.message || emailErr);
+            // Optionally log this to a file or monitoring service
+        }
+
         return res.status(200).json({
             status: 200,
             message: "User Account Disabled Successfully",
             data: { disabledUser }
         });
+
     } catch (error) {
         res.status(500).json({
             status: 500,
@@ -113,7 +126,7 @@ export const disableUser = async (req: any, res: Response, next: NextFunction): 
     }
 };
 
-export const enableUser = async (req: any, res: Response, next: NextFunction): Promise<any> => {
+const enableUser = async (req: any, res: Response, next: NextFunction): Promise<any> => {
     try {
         req.body.isDisabled = false
 
@@ -126,8 +139,9 @@ export const enableUser = async (req: any, res: Response, next: NextFunction): P
 
         const enabledUser = await workersRepositories.updateUser(req.user._id, req.body);
 
-        await sendEmail(req.user.email, "Account enabled.", 'Your account is enabled',
-            `
+        try {
+            await sendEmail(req.user.email, "Account enabled.", 'Your account is enabled',
+                `
              <p>We are delighted to inform you that your Kickside account has been re-enabled. It’s great to have you back with us!</p>
             <p>We appreciate your dedication and contribution as a valued team member in your role as <b>${req.user.role}</b>. 
             <br> We are excited to see your continued impact on our platform and community.</p>
@@ -136,7 +150,11 @@ export const enableUser = async (req: any, res: Response, next: NextFunction): P
             <p>Best regards,</p>
             <p><b>Kickside Rwanda Team</b></p>
             `
-        )
+            )
+
+        } catch (emailErr) {
+            console.error("Email sending failed:", emailErr.message || emailErr);
+        }
 
 
         return res.status(200).json({

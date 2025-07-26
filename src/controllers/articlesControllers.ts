@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 import slugify from 'slugify';
-import articlesRepositories from "../repository/articlesRepositories"
+import articlesRepositories, { adminGetJournalistAnalytics } from "../repository/articlesRepositories"
 import authRepositories from "../repository/authRepositories";
 
 const getPublishedArticles = async (req: Request, res: Response): Promise<any> => {
@@ -352,6 +352,22 @@ const journalistGetMonthlyTopArticles = async (req: any, res: Response): Promise
     }
 };
 
+export const adminFetchJournalistAnalytics = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        console.log(userId)
+        const analytics = await adminGetJournalistAnalytics(userId);
+        res.status(200).json({
+            status: 200,
+            message: "Data analytics retrieved successsfully",
+            data: analytics
+        });
+    } catch (error) {
+        console.error('Analytics fetch failed:', error);
+        res.status(500).json({ error: 'Failed to fetch analytics' });
+    }
+};
+
 export default {
     getPublishedArticles,
     getAllArticles,
@@ -369,5 +385,6 @@ export default {
     journalistAnalytics,
     getAuthorProfile,
     getPopularArticles,
-    journalistGetMonthlyTopArticles
+    journalistGetMonthlyTopArticles,
+    adminFetchJournalistAnalytics
 }
