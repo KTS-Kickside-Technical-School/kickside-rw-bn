@@ -96,26 +96,6 @@ const generateSlug = (title: string) => {
     return `${year}-${month}-${baseSlug}-${time}`;
 };
 
-const requestArticleEditAccess = async (req: any, res: Response, next: NextFunction): Promise<any> => {
-    try {
-        const data = {
-            article: req.article._id,
-            journalist: req.user._id
-        }
-        const request = await articlesRepositories.saveArticleEditRequest(data)
-        return res.status(201).json({
-            status: 201,
-            message: "Edit request is sent successfully",
-            request
-        })
-    } catch (error) {
-        res.status(500).json({
-            status: 500,
-            message: error.message
-        })
-    }
-}
-
 const editArticle = async (req: any, res: Response): Promise<any> => {
     try {
         req.body.status = "unpublished";
@@ -170,41 +150,6 @@ const toggleArticlePublish = async (req: any, res: Response): Promise<any> => {
     }
 }
 
-const getAllArticlesEditRequests = async (req: any, res: Response): Promise<any> => {
-    try {
-        const editRequests = await articlesRepositories.findArticlesEditRequests();
-        return res.status(200).json({
-            status: 200,
-            message: "Edit articles requests successfully retrieved.",
-            data: {
-                editRequests
-            }
-        })
-    } catch (error) {
-        res.status(500).json({
-            status: 500,
-            message: error.message
-        })
-    }
-}
-
-const approveArticlesEditRequests = async (req: any, res: Response): Promise<any> => {
-    try {
-        const article = await articlesRepositories.editArticle(req.editRequest.article, { isEditable: true });
-        const editRequest = await articlesRepositories.editArticleEditRequest(req.editRequest._id, { isAccepted: true });
-
-        return res.status(200).json({
-            status: 200,
-            message: "Article requeest is approved successfully",
-            data: { article, editRequest }
-        })
-    } catch (error) {
-        res.status(500).json({
-            status: 500,
-            message: error.message
-        })
-    }
-}
 
 const postArticleComment = async (req: any, res: Response): Promise<any> => {
     try {
@@ -374,11 +319,8 @@ export default {
     getOwnArticles,
     getSingleArticle,
     createNewArticle,
-    requestArticleEditAccess,
     editArticle,
     toggleArticlePublish,
-    getAllArticlesEditRequests,
-    approveArticlesEditRequests,
     postArticleComment,
     deleteArticle,
     getArticlesByCategory,

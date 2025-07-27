@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import Article from "../database/models/article"
 import ArticleComment from "../database/models/articleComment";
-import ArticlesEditRequest from "../database/models/articlesEditRequest";
 import ArticleView from "../database/models/articlesViews";
 import moment from "moment";
 
@@ -32,28 +31,12 @@ const saveArticle = async (data: any) => {
     return await Article.create(data)
 }
 
-const saveArticleEditRequest = async (data: any) => {
-    return ArticlesEditRequest.create(data);
-}
-
-const findArticleEditRequestByAttribute = async (key: any, value: String) => {
-    return ArticlesEditRequest.findOne({ [key]: value });
-}
-
 const editArticle = async (_id: String, data: any) => {
     return Article.findByIdAndUpdate({ _id }, data, { new: true })
 }
 
 const findArticleComments = async (article: any) => {
     return ArticleComment.find({ article })
-}
-
-const findArticlesEditRequests = async () => {
-    return ArticlesEditRequest.find().populate('journalist').populate('article').sort({ isAccepted: 1 })
-}
-
-const editArticleEditRequest = async (_id: any, data: any) => {
-    return await ArticlesEditRequest.findByIdAndUpdate({ _id }, data, { new: true })
 }
 
 const saveArticleComment = async (data: any) => {
@@ -581,12 +564,8 @@ export default {
     findArticleByAttribute,
     findArticlesByAttribute,
     saveArticle,
-    saveArticleEditRequest,
-    findArticleEditRequestByAttribute,
     editArticle,
     findArticleComments,
-    findArticlesEditRequests,
-    editArticleEditRequest,
     saveArticleComment,
     deleteArticle,
     saveArticleViewsRecord,
